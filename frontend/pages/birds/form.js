@@ -6,6 +6,8 @@ import Box from "@mui/system/Box";
 import { onSubmit } from "../../utils/fetch";
 import HabitatForm from "../../components/habitat/form";
 
+const urlBase = process.env.NEXT_PUBLIC_BASEURL;
+
 const BirdsForm = () => {
   const router = useRouter();
 
@@ -19,7 +21,6 @@ const BirdsForm = () => {
     bird_image_link: "",
     habitats: "",
   });
-  const urlBase = "http://127.0.0.1:5000";
 
   useEffect(() => {
     fetch(`${urlBase}/habitats`)
@@ -60,7 +61,7 @@ const BirdsForm = () => {
   useEffect(() => {
     if (habitatsOptions && value) {
       const intialHabitats = habitatsOptions.filter((habitat) =>
-      value.habitats.includes(habitat.value)
+        value.habitats.includes(habitat.value)
       );
       setSelectedHabitats(intialHabitats);
     }
@@ -140,7 +141,9 @@ const BirdsForm = () => {
           </button>
         </form>
       </Box>
-      <p style={{ fontStyle: "italic" }}>HINT: Cant find your Habitat? Add a new habitat below:</p>
+      <p style={{ fontStyle: "italic" }}>
+        HINT: Cant find your Habitat? Add a new habitat below:
+      </p>
       <HabitatForm />
     </div>
   );

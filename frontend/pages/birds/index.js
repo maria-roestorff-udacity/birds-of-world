@@ -3,13 +3,14 @@ import React, { useState, useEffect } from "react";
 import Grid from "@mui/system/Unstable_Grid";
 import Stack from "@mui/system/Stack";
 
+const urlBase = process.env.NEXT_PUBLIC_BASEURL;
+
 const Birds = () => {
   const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const urlBase = "http://127.0.0.1:5000";
     fetch(`${urlBase}/birds`)
       .then((res) => res.json())
       .then((data) => {

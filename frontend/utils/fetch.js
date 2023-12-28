@@ -1,4 +1,4 @@
-const urlBase = "http://127.0.0.1:5000";
+const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
 export const onSubmit = async (id, resource, value, setLoading, setError) => {
   setLoading(true);
@@ -28,7 +28,6 @@ export const onSubmit = async (id, resource, value, setLoading, setError) => {
 };
 
 export const fetchOptions = async (resource, setError, setLoading) => {
-
   return await fetch(`${urlBase}/${resource}`)
     .then((res) => res.json())
     .then((data) => {
@@ -36,8 +35,7 @@ export const fetchOptions = async (resource, setError, setLoading) => {
         const options = data[resource].map((item) => {
           return { value: item.id, label: item.name };
         });
-        return options
-        ;
+        return options;
       }
     })
     .catch((error) => setError(error.message))

@@ -4,7 +4,7 @@ import Select from "react-select";
 import Box from "@mui/system/Box";
 import { onSubmit } from "../../utils/fetch";
 
-const urlBase = "http://127.0.0.1:5000";
+const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
 const HabitatForm = () => {
   const router = useRouter();
