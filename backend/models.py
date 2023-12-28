@@ -24,7 +24,6 @@ def setup_db(app, database_path=database_path):
         db.create_all()
 
 
-
 '''
 Habitat to Bird Relationship
 many to many
@@ -48,7 +47,8 @@ class Region(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
     region_image_link = db.Column(db.String(500))
-    habitats = db.relationship('Habitat', backref=db.backref('habitat_region', lazy=True))
+    habitats = db.relationship(
+        'Habitat', backref=db.backref('habitat_region', lazy=True))
 
     def __init__(self, name, region_image_link=""):
         self.name = name
@@ -85,7 +85,6 @@ class Habitat(db.Model):
     name = db.Column(db.String, nullable=False, unique=True)
     region_id = db.Column(db.Integer, db.ForeignKey(
         'Regions.id'), nullable=False)
-    
 
     def __init__(self, name, region_id):
         self.name = name
@@ -113,6 +112,8 @@ class Habitat(db.Model):
 Bird
 Have common_name, species, image and habitats
 '''
+
+
 class Bird(db.Model):
     __tablename__ = 'Birds'
 
@@ -134,7 +135,7 @@ class Bird(db.Model):
 
     def update(self):
         db.session.commit()
-   
+
     def delete(self):
         db.session.delete(self)
         db.session.commit()
@@ -148,17 +149,19 @@ class Bird(db.Model):
             'bird_image_link': self.bird_image_link,
             'habitats': habitat_id}
 
-
-    def format(self):   
-        habitat_name = [item.name for item in self.habitats]
+    def format(self):
+        habitats = [{'name': item.name, 'id': item.id}
+                    for item in self.habitats]
         regions = []
-        [regions.append(reg.habitat_region) for reg in self.habitats if reg.habitat_region not in regions]
-        region_info = [{'name': item.name, 'image':item.region_image_link } for item in regions]
+        [regions.append(reg.habitat_region)
+         for reg in self.habitats if reg.habitat_region not in regions]
+        region_info = [{'name': item.name, 'image': item.region_image_link}
+                       for item in regions]
 
         return {
             'id': self.id,
             'common_name': self.common_name,
             'species': self.species,
             'bird_image_link': self.bird_image_link,
-            'habitats': habitat_name,
+            'habitats': habitats,
             'regions': region_info}

@@ -17,7 +17,7 @@ def paginate_items(request, selection_query):
         current_index * items_limit).all()
     # If the page query param is out of range abort
     if len(selection) == 0:
-            abort(404)
+        abort(404)
     items = [item.format() for item in selection]
     return items
 
@@ -63,7 +63,7 @@ def create_app(test_config=None):
     @app.route('/birds/<int:bird_id>', methods=['GET'])
     def get_specified_bird(bird_id):
         try:
-            get_bird = Bird.query.filter(Bird.id == bird_id).one_or_none();
+            get_bird = Bird.query.filter(Bird.id == bird_id).one_or_none()
             # Resource not found
             if get_bird is None:
                 abort(404)
@@ -95,13 +95,18 @@ def create_app(test_config=None):
             new_bird = Bird(common_name=common_name, species=species,
                             bird_image_link=bird_image_link)
             get_habitats = Habitat.query.filter(Habitat.id.in_(habitats)).all()
+
+            # TODO what if habitat contains id not in db
+            if len(get_habitats) == 0:
+                abort(400)
+
             new_bird.habitats = get_habitats
             new_bird.insert()
 
             return jsonify(
                 {
                     'success': True,
-                    'movies': new_bird.id,
+                    'bird': new_bird.id,
                 }
             )
         except Exception as e:
@@ -109,15 +114,14 @@ def create_app(test_config=None):
                 abort(e.code)
             abort(422)
 
-
     @app.route('/birds/<int:bird_id>', methods=['PUT'])
     def edit_birds(bird_id):
         try:
-            edit_bird = Bird.query.filter(Bird.id == bird_id).one_or_none();
+            edit_bird = Bird.query.filter(Bird.id == bird_id).one_or_none()
             # Resource not found
             if edit_bird is None:
                 abort(404)
-            
+
             body = request.get_json()
             common_name = body.get('common_name', None)
             species = body.get('species', None)
@@ -128,16 +132,17 @@ def create_app(test_config=None):
                 edit_bird.common_name = common_name
             if species:
                 edit_bird.species = species
-            if bird_image_link: 
+            if bird_image_link:
                 edit_bird.bird_image_link = bird_image_link
             if habitats:
-                get_habitats = Habitat.query.filter(Habitat.id.in_(habitats)).all()
+                get_habitats = Habitat.query.filter(
+                    Habitat.id.in_(habitats)).all()
                 edit_bird.habitats = get_habitats
 
             try:
                 edit_bird.update()
             except Exception as error:
-                abort(422)    
+                abort(422)
 
             return jsonify(
                 {
@@ -153,8 +158,8 @@ def create_app(test_config=None):
     @app.route('/habitats', methods=['GET'])
     def get_habitats():
         try:
-            habitats = Habitat.query.order_by(Habitat.id).all() 
-            habitats_formatted = [habitat.format() for habitat in habitats]         
+            habitats = Habitat.query.order_by(Habitat.id).all()
+            habitats_formatted = [habitat.format() for habitat in habitats]
             return jsonify(
                 {
                     'success': True,
@@ -167,11 +172,11 @@ def create_app(test_config=None):
                 abort(e.code)
             abort(422)
 
-    
     @app.route('/habitats/<int:habitat_id>', methods=['GET'])
     def get_specified_habitat(habitat_id):
         try:
-            get_habitat = Habitat.query.filter(Habitat.id == habitat_id).one_or_none();
+            get_habitat = Habitat.query.filter(
+                Habitat.id == habitat_id).one_or_none()
             # Resource not found
             if get_habitat is None:
                 abort(404)
@@ -179,14 +184,13 @@ def create_app(test_config=None):
             return jsonify(
                 {
                     'success': True,
-                    'bird': get_habitat.format()
+                    'habitat': get_habitat.format()
                 }
             )
         except Exception as e:
             if isinstance(e, HTTPException):
                 abort(e.code)
             abort(422)
-
 
     @app.route('/habitats', methods=['POST'])
     def add_habitats():
@@ -194,18 +198,30 @@ def create_app(test_config=None):
             body = request.get_json()
             name = body.get('name', None)
             region_id = body.get('region_id', None)
+            habitat_bird = body.get('bird', None)
 
             # if required attributes are not submitted abort
             if None in [name or region_id]:
                 abort(400)
 
-            new_habitat = Habitat(name=name, region_id=region_id)
+            region = Region.query.filter(Region.id == region_id).one_or_none()
+            if region is None:
+                abort(400)
+
+            new_habitat = Habitat(name=name, region_id=region.id)
+
+            if habitat_bird:
+                update_bird = Bird.query.filter(
+                    Bird.id == habitat_bird).one_or_none()
+                new_habitat.Birds.append(update_bird)
+                
+
             new_habitat.insert()
 
             return jsonify(
                 {
                     'success': True,
-                    'movies': new_habitat.id,
+                    'habitat': new_habitat.id,
                 }
             )
         except Exception as e:
@@ -213,15 +229,16 @@ def create_app(test_config=None):
                 abort(e.code)
             abort(422)
 
-
     @app.route('/habitats/<int:habitat_id>', methods=['PUT'])
     def edit_habitats(habitat_id):
         try:
-            edit_habitat = Habitat.query.filter(Habitat.id == habitat_id).one_or_none();
+            edit_habitat = Habitat.query.filter(
+                Habitat.id == habitat_id).one_or_none()
+
             # Resource not found
             if edit_habitat is None:
                 abort(404)
-            
+
             body = request.get_json()
             name = body.get('name', None)
             region_id = body.get('region_id', None)
@@ -234,12 +251,12 @@ def create_app(test_config=None):
             try:
                 edit_habitat.update()
             except Exception as error:
-                abort(422)    
+                abort(422)
 
             return jsonify(
                 {
                     'success': True,
-                    'bird': edit_habitat.id,
+                    'habitat': edit_habitat.id,
                 }
             )
         except Exception as e:
@@ -247,12 +264,11 @@ def create_app(test_config=None):
                 abort(e.code)
             abort(422)
 
-   
     @app.route('/regions', methods=['GET'])
     def get_regions():
         try:
-            regions = Region.query.order_by(Region.id).all() 
-            regions_formatted = [region.format() for region in regions]         
+            regions = Region.query.order_by(Region.id).all()
+            regions_formatted = [region.format() for region in regions]
             return jsonify(
                 {
                     'success': True,

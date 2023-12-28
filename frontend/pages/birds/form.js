@@ -25,7 +25,7 @@ const BirdsForm = () => {
     fetch(`${urlBase}/habitats`)
       .then((res) => res.json())
       .then((data) => {
-        if (data["habitats"]) {
+        if (data.habitats) {
           const options = data.habitats.map((habitat) => {
             return { value: habitat.id, label: habitat.name };
           });
@@ -49,20 +49,22 @@ const BirdsForm = () => {
               bird_image_link: data.bird.bird_image_link,
               habitats: data.bird.habitats,
             };
-
-            if (habitatsOptions) {
-              const intialHabitats = habitatsOptions.filter((habitat) =>
-                data.bird.habitats.includes(habitat.value)
-              );
-              setSelectedHabitats(intialHabitats);
-            }
             setValue(newValue);
           })
           .catch((error) => setError(error.message))
           .finally(() => setLoading(false));
       }
     }
-  }, [router, habitatsOptions]);
+  }, [router]);
+
+  useEffect(() => {
+    if (habitatsOptions && value) {
+      const intialHabitats = habitatsOptions.filter((habitat) =>
+      value.habitats.includes(habitat.value)
+      );
+      setSelectedHabitats(intialHabitats);
+    }
+  }, [habitatsOptions, value]);
 
   if (isLoading) return <p>Loading...</p>;
 
@@ -138,7 +140,7 @@ const BirdsForm = () => {
           </button>
         </form>
       </Box>
-      <p>HINT: Cant find your Habitat? Add a new habitat below</p>
+      <p style={{ fontStyle: "italic" }}>HINT: Cant find your Habitat? Add a new habitat below:</p>
       <HabitatForm />
     </div>
   );

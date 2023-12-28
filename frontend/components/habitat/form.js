@@ -1,4 +1,4 @@
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import Box from "@mui/system/Box";
@@ -15,6 +15,7 @@ const HabitatForm = () => {
   const [value, setValue] = useState({
     name: "",
     region_id: "",
+    bird: "",
   });
 
   useEffect(() => {
@@ -34,41 +35,50 @@ const HabitatForm = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      const id = router.query.habitat;
-      if (id) {
-        fetch(`${urlBase}/habitats/${id}`)
+      const bird_id = router.query.id;
+      if (bird_id) {
+        setValue({ ...value, bird: bird_id });
+      }
+
+      const habitat_id = router.query.habitat;
+      if (habitat_id) {
+        fetch(`${urlBase}/habitats/${habitat_id}`)
           .then((res) => res.json())
           .then((data) => {
             const newValue = {
               name: data.habitat.name,
               region_id: data.habitat.region_id,
             };
-            if (regionOptions) {
-              const intialRegion = regionOptions.filter(
-                (habitat) => data.habitat.region_id == habitat.value
-              );
-              setSelectedRegion(intialRegion);
-            }
             setValue(newValue);
           })
           .catch((error) => setError(error.message))
           .finally(() => setLoading(false));
       }
     }
-  }, [router, regionOptions]);
+  }, [router]);
+
+  useEffect(() => {
+    if (regionOptions && value) {
+      const intialRegion = regionOptions.filter(
+        (habitat) => value.region_id == habitat.value
+      );
+      setSelectedRegion(intialRegion);
+    }
+  }, [regionOptions, value]);
 
   if (isLoading) return <p>Loading...</p>;
 
   const onSubmitHabitat = async (event) => {
     event.preventDefault();
     const id = router.query.habitat;
-    await onSubmit(id, "habitats", value, setLoading, setError);
+    await onSubmit(id, "habitats", value, setLoading, setError).finally(() =>
+      router.reload(window.location.pathname)
+    );
   };
 
   return (
     <Box my={2}>
       {error && <div style={{ color: "red" }}>{error}</div>}
-      <h2>Fill in the Habitat Form</h2>
       <form onSubmit={onSubmitHabitat}>
         <label htmlFor="name">Habitat name:</label>
         <input
@@ -93,7 +103,7 @@ const HabitatForm = () => {
           isSearchable
         />
         <button type="submit" disabled={isLoading}>
-          {isLoading ? "Loading..." : "Submit"}
+          {isLoading ? "Loading..." : "Add Habitat"}
         </button>
       </form>
     </Box>

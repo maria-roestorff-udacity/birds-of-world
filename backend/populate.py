@@ -65,7 +65,8 @@ def populate_birds():
         image = bird.get("image")
         habitats = bird.get("habitats")
         get_habitat = Habitat.query.filter(Habitat.name.in_(habitats)).all()
-        new_bird = Bird(common_name=common_name, species=species, bird_image_link=image)
+        new_bird = Bird(common_name=common_name,
+                        species=species, bird_image_link=image)
         new_bird.habitats = get_habitat
         new_bird.insert()
 

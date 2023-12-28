@@ -13,7 +13,6 @@ const Birds = () => {
     fetch(`${urlBase}/birds`)
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
         setData(data);
       })
       .catch((error) => setError(error.message))
@@ -27,7 +26,7 @@ const Birds = () => {
     <div>
       <h1>Birds Of The World</h1> <Link href="birds/form">Form</Link>
       {error && <div style={{ color: "red" }}>{error}</div>}
-      <Grid container spacing={2} >
+      <Grid container spacing={2}>
         <Grid xs={2}>
           <h2>Name</h2>
         </Grid>
@@ -43,26 +42,36 @@ const Birds = () => {
       </Grid>
       {data.birds.map((bird) => (
         <Grid container spacing={3} mb={1.5} key={`${bird.common_name}`}>
-          <Grid xs={2} style={{ border: '1px solid #80808075' }}>
+          <Grid xs={2} style={{ border: "1px solid #80808075" }}>
             <h3>{bird.common_name}</h3>
             <br />
             <h5 style={{ fontStyle: "italic" }}>{bird.species}</h5>
+            <Link href={`birds/form?id=${bird.id}`}>Edit Bird</Link>
           </Grid>
-          <Grid xs={3} style={{ border: '1px solid #80808075' }}>
+          <Grid xs={3} style={{ border: "1px solid #80808075" }}>
             <img
               src={bird.bird_image_link}
               alt="External Image"
               style={{ width: "100%" }}
             />
           </Grid>
-          <Grid xs={3} style={{ border: '1px solid #80808075' }}>
+          <Grid xs={3} style={{ border: "1px solid #80808075" }}>
             <Stack component="ul" spacing={1}>
               {bird.habitats.map((habitat) => (
-                <li key={`${bird.common_name}-${habitat}`}>{habitat}</li>
+                <li key={`${bird.common_name}-${habitat.id}`}>
+                  <Link href={`habitats?habitat=${habitat.id}`}>
+                    {habitat.name}
+                  </Link>
+                </li>
               ))}
             </Stack>
           </Grid>
-          <Grid container spacing={0} xs={4} style={{ border: '1px solid #80808075' }}>
+          <Grid
+            container
+            spacing={0}
+            xs={4}
+            style={{ border: "1px solid #80808075" }}
+          >
             {bird.regions.map((region) => {
               const size = 12 / bird.regions.length;
               return (
