@@ -476,7 +476,7 @@ nanoid@^3.3.6:
   resolved "https://repo.forge.lmig.com/api/npm/npm/nanoid/-/nanoid-3.3.7.tgz"
   integrity sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==
 
-next@latest:
+next@^14.0.4:
   version "14.0.4"
   resolved "https://repo.forge.lmig.com/api/npm/npm/next/-/next-14.0.4.tgz"
   integrity sha512-qbwypnM7327SadwFtxXnQdGiKpkuhaRLE2uq62/nRul9cj9KhQ5LhHmlziTNqUidZotw/Q1I9OjirBROdUJNgA==
