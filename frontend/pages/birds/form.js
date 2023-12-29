@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import Box from "@mui/system/Box";
-import { onSubmit } from "../../utils/fetch";
 import HabitatForm from "../../components/habitat/form";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
@@ -18,7 +17,7 @@ const BirdsForm = () => {
   const [value, setValue] = useState({
     common_name: "",
     species: "",
-    bird_image_link: "",
+    image_link: "",
     habitats: "",
   });
 
@@ -47,7 +46,7 @@ const BirdsForm = () => {
             const newValue = {
               common_name: data.bird.common_name,
               species: data.bird.species,
-              bird_image_link: data.bird.bird_image_link,
+              image_link: data.bird.image_link,
               habitats: data.bird.habitats,
             };
             setValue(newValue);
@@ -72,7 +71,36 @@ const BirdsForm = () => {
   const onSubmitBird = async (event) => {
     event.preventDefault();
     const id = router.query.id;
-    await onSubmit(id, "birds", value, setLoading, setError);
+
+    console.log(value);
+
+    setLoading(true);
+    setError(null); // Clear previous errors when a new request starts
+
+    const url = `${urlBase}/birds${id ? `/${id}` : ""}`;
+    const method = id ? "PUT" : "POST";
+    let res;
+
+    try {
+      const response = await fetch(url, {
+        method,
+        body: JSON.stringify(value),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit the data. Please try again.");
+      }
+      res = await response.json();
+    } catch (error) {
+      // Capture the error message to display to the user
+      setError(error.message);
+      console.error(error);
+    } finally {
+      setLoading(false);
+      router.push(`${router.pathname}/?id=${res.bird}`, undefined, {
+        shallow: true,
+      });
+    }
   };
 
   const onChange = (e) => {
@@ -117,12 +145,12 @@ const BirdsForm = () => {
             required
           />
           <br />
-          <label htmlFor="bird_image_link">Link for bird Image:</label>
+          <label htmlFor="image_link">Link for bird Image:</label>
           <input
             type="text"
-            name="bird_image_link"
-            id="bird_image_link"
-            value={value.bird_image_link}
+            name="image_link"
+            id="image_link"
+            value={value.image_link}
             onChange={onChange}
             size="80"
           />
@@ -144,7 +172,11 @@ const BirdsForm = () => {
       <p style={{ fontStyle: "italic" }}>
         HINT: Cant find your Habitat? Add a new habitat below:
       </p>
-      <HabitatForm />
+      <HabitatForm
+        setHabitatsOptions={setHabitatsOptions}
+        setBird={setValue}
+        bird={value}
+      />
     </div>
   );
 };

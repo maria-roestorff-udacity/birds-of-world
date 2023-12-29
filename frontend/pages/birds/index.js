@@ -51,7 +51,7 @@ const Birds = () => {
           </Grid>
           <Grid xs={3} style={{ border: "1px solid #80808075" }}>
             <img
-              src={bird.bird_image_link}
+              src={bird.image_link}
               alt="External Image"
               style={{ width: "100%" }}
             />

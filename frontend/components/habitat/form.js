@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import Box from "@mui/system/Box";
-import { onSubmit } from "../../utils/fetch";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
-const HabitatForm = () => {
+const HabitatForm = ({
+  setHabitatsOptions = () => {},
+  setBird = () => {},
+  bird,
+}) => {
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -39,7 +42,6 @@ const HabitatForm = () => {
       if (bird_id) {
         setValue({ ...value, bird: bird_id });
       }
-
       const habitat_id = router.query.habitat;
       if (habitat_id) {
         fetch(`${urlBase}/habitats/${habitat_id}`)
@@ -48,6 +50,7 @@ const HabitatForm = () => {
             const newValue = {
               name: data.habitat.name,
               region_id: data.habitat.region_id,
+              bird: "",
             };
             setValue(newValue);
           })
@@ -71,9 +74,49 @@ const HabitatForm = () => {
   const onSubmitHabitat = async (event) => {
     event.preventDefault();
     const id = router.query.habitat;
-    await onSubmit(id, "habitats", value, setLoading, setError).finally(() =>
-      router.reload(window.location.pathname)
-    );
+
+    setLoading(true);
+    setError(null); // Clear previous errors when a new request starts
+
+    const url = `${urlBase}/habitats${id ? `/${id}` : ""}`;
+    const method = id ? "PUT" : "POST";
+
+    try {
+      const response = await fetch(url, {
+        method,
+        body: JSON.stringify(value),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to submit the data. Please try again.");
+      }
+      // Handle response if necessary
+      const res = await response.json();
+
+      if (bird) {
+        setHabitatsOptions((prev) => [
+          ...prev,
+          {
+            value: res.habitat.id,
+            label: res.habitat.name,
+          },
+        ]);
+        setBird({ ...bird, habitats: [...bird.habitats, res.habitat.id] });
+      }
+    } catch (error) {
+      // Capture the error message to display to the user
+      setError(error.message);
+      console.error(error);
+    } finally {
+      if (router.pathname == "/birds/form") {
+        setSelectedRegion(null);
+        const newValue = { ...value };
+        newValue.name = "";
+        newValue.region_id = "";
+        setValue(newValue);
+      }
+      setLoading(false);
+    }
   };
 
   return (

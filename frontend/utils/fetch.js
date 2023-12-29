@@ -17,7 +17,7 @@ export const onSubmit = async (id, resource, value, setLoading, setError) => {
       throw new Error("Failed to submit the data. Please try again.");
     }
     // Handle response if necessary
-    // const data = await response.json();
+    return await response.json();
   } catch (error) {
     // Capture the error message to display to the user
     setError(error.message);

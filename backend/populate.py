@@ -22,7 +22,7 @@ def populate_region():
     for region in region_info:
         name = region.get("name")
         image = region.get("image")
-        new_region = Region(name=name, region_image_link=image)
+        new_region = Region(name=name, image_link=image)
         new_region.insert()
 
 
@@ -66,7 +66,7 @@ def populate_birds():
         habitats = bird.get("habitats")
         get_habitat = Habitat.query.filter(Habitat.name.in_(habitats)).all()
         new_bird = Bird(common_name=common_name,
-                        species=species, bird_image_link=image)
+                        species=species, image_link=image)
         new_bird.habitats = get_habitat
         new_bird.insert()
 

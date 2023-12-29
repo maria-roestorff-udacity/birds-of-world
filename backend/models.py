@@ -46,13 +46,13 @@ class Region(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False, unique=True)
-    region_image_link = db.Column(db.String(500))
+    image_link = db.Column(db.String(500))
     habitats = db.relationship(
         'Habitat', backref=db.backref('habitat_region', lazy=True))
 
-    def __init__(self, name, region_image_link=""):
+    def __init__(self, name, image_link=""):
         self.name = name
-        self.region_image_link = region_image_link
+        self.image_link = image_link
 
     def insert(self):
         db.session.add(self)
@@ -69,7 +69,7 @@ class Region(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'region_image_link': self.region_image_link}
+            'image_link': self.image_link}
 
 
 '''
@@ -120,14 +120,14 @@ class Bird(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     common_name = db.Column(db.String, nullable=False, unique=True)
     species = db.Column(db.String, nullable=False)
-    bird_image_link = db.Column(db.String(500))
+    image_link = db.Column(db.String(500))
     habitats = db.relationship('Habitat', secondary=range,
                                backref=db.backref('Birds', lazy=True))
 
-    def __init__(self, common_name, species, bird_image_link=""):
+    def __init__(self, common_name, species, image_link=""):
         self.common_name = common_name
         self.species = species
-        self.bird_image_link = bird_image_link
+        self.image_link = image_link
 
     def insert(self):
         db.session.add(self)
@@ -146,7 +146,7 @@ class Bird(db.Model):
             'id': self.id,
             'common_name': self.common_name,
             'species': self.species,
-            'bird_image_link': self.bird_image_link,
+            'image_link': self.image_link,
             'habitats': habitat_id}
 
     def format(self):
@@ -155,13 +155,13 @@ class Bird(db.Model):
         regions = []
         [regions.append(reg.habitat_region)
          for reg in self.habitats if reg.habitat_region not in regions]
-        region_info = [{'name': item.name, 'image': item.region_image_link}
+        region_info = [{'name': item.name, 'image': item.image_link}
                        for item in regions]
 
         return {
             'id': self.id,
             'common_name': self.common_name,
             'species': self.species,
-            'bird_image_link': self.bird_image_link,
+            'image_link': self.image_link,
             'habitats': habitats,
             'regions': region_info}

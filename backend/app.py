@@ -86,21 +86,28 @@ def create_app(test_config=None):
             common_name = body.get('common_name', None)
             species = body.get('species', None)
             habitats = body.get('habitats', None)
-            bird_image_link = body.get('image', '')
+            image_link = body.get('image_link', '')
 
             # if required attributes are not submitted abort
-            if None in [common_name or species or habitats]:
+            if None in [common_name or species or habitats] or len(habitats) == 0:
                 abort(400)
 
             new_bird = Bird(common_name=common_name, species=species,
-                            bird_image_link=bird_image_link)
-            get_habitats = Habitat.query.filter(Habitat.id.in_(habitats)).all()
+                            image_link=image_link)
+
+            for habitat in habitats:
+                get_habitat = Habitat.query.filter(
+                    Habitat.id == habitat).one_or_none()
+                # one of the habitats provided doesnt match the habitats in the db
+                if get_habitat is None:
+                    abort(400)
+                new_bird.habitats.append(get_habitat)
 
             # TODO what if habitat contains id not in db
-            if len(get_habitats) == 0:
-                abort(400)
+            # if len(get_habitats) == 0:
+                # abort(400)
+            # new_bird.habitats = get_habitats
 
-            new_bird.habitats = get_habitats
             new_bird.insert()
 
             return jsonify(
@@ -125,15 +132,15 @@ def create_app(test_config=None):
             body = request.get_json()
             common_name = body.get('common_name', None)
             species = body.get('species', None)
-            bird_image_link = body.get('image', None)
+            image_link = body.get('image_link', None)
             habitats = body.get('habitats', None)
 
             if common_name:
                 edit_bird.common_name = common_name
             if species:
                 edit_bird.species = species
-            if bird_image_link:
-                edit_bird.bird_image_link = bird_image_link
+            if image_link:
+                edit_bird.image_link = image_link
             if habitats:
                 get_habitats = Habitat.query.filter(
                     Habitat.id.in_(habitats)).all()
@@ -210,18 +217,21 @@ def create_app(test_config=None):
 
             new_habitat = Habitat(name=name, region_id=region.id)
 
-            if habitat_bird:
+            if len(habitat_bird) > 0:
                 update_bird = Bird.query.filter(
                     Bird.id == habitat_bird).one_or_none()
+
+                if update_bird is None:
+                    abort(400)
+
                 new_habitat.Birds.append(update_bird)
-                
 
             new_habitat.insert()
 
             return jsonify(
                 {
                     'success': True,
-                    'habitat': new_habitat.id,
+                    'habitat': new_habitat.format(),
                 }
             )
         except Exception as e:
