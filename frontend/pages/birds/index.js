@@ -47,7 +47,7 @@ const Birds = () => {
             <h3>{bird.common_name}</h3>
             <br />
             <h5 style={{ fontStyle: "italic" }}>{bird.species}</h5>
-            <Link href={`birds/form?id=${bird.id}`}>Edit Bird</Link>
+            <Link href={`birds/form?bird=${bird.id}`}>Edit Bird</Link>
           </Grid>
           <Grid xs={3} style={{ border: "1px solid #80808075" }}>
             <img

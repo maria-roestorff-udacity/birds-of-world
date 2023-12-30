@@ -38,7 +38,7 @@ const HabitatForm = ({
 
   useEffect(() => {
     if (router.isReady) {
-      const bird_id = router.query.id;
+      const bird_id = router.query.bird;
       if (bird_id) {
         setValue({ ...value, bird: bird_id });
       }

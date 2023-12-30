@@ -38,7 +38,7 @@ const BirdsForm = () => {
 
   useEffect(() => {
     if (router.isReady) {
-      const id = router.query.id;
+      const id = router.query.bird;
       if (id) {
         fetch(`${urlBase}/birds/${id}`)
           .then((res) => res.json())
@@ -70,9 +70,7 @@ const BirdsForm = () => {
 
   const onSubmitBird = async (event) => {
     event.preventDefault();
-    const id = router.query.id;
-
-    console.log(value);
+    const id = router.query.bird;
 
     setLoading(true);
     setError(null); // Clear previous errors when a new request starts
@@ -97,9 +95,11 @@ const BirdsForm = () => {
       console.error(error);
     } finally {
       setLoading(false);
-      router.push(`${router.pathname}/?id=${res.bird}`, undefined, {
-        shallow: true,
-      });
+      if (res) {
+        router.push(`${router.pathname}/?bird=${res?.bird}`, undefined, {
+          shallow: true,
+        });
+      }
     }
   };
 
@@ -145,7 +145,7 @@ const BirdsForm = () => {
             required
           />
           <br />
-          <label htmlFor="image_link">Link for bird Image:</label>
+          <label htmlFor="image_link">Link for bird image:</label>
           <input
             type="text"
             name="image_link"
