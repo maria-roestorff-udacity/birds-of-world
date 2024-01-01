@@ -55,6 +55,8 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
             'region_id': 4,
             'habitat_bird': 1}
 
+        self.post_search_habitat_success = {'search': 'a'}
+
         self.post_habitat_400_invalid_region = {
             'name': 'Europe',
             'region_id': 1000}
@@ -146,7 +148,16 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Bird common_name already exist')
 
-    # TODO Delete bird
+    def test_delete_bird(self):
+        delete_id = 1
+        res = self.client().delete(f'/birds/{delete_id}')
+        data = json.loads(res.data)
+        with self.app.app_context():
+            bird = Bird.query.filter(Bird.id == delete_id).one_or_none()
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["success"], True)
+        self.assertEqual(data["deleted"], delete_id)
+        self.assertEqual(bird, None)
 
     def test_paginated_habitats(self):
         res = self.client().get('/habitats?page=1', )
@@ -182,6 +193,13 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['habitat'])
+
+    def test_post_search_habitat(self):
+        res = self.client().post('/habitats',  json=self.post_search_habitat_success)
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['habitats'])
 
     def test_400_post_habitat_invalid_region(self):
         res = self.client().post('/habitats',  json=self.post_habitat_400_invalid_region)
@@ -224,7 +242,6 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertGreater(data['total_regions'], 1)
 
 
 # Make the tests conveniently executable

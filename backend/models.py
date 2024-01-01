@@ -112,15 +112,6 @@ class Bird(db.Model):
         db.session.delete(self)
         db.session.commit()
 
-    def edit_format(self):
-        habitat_id = [item.id for item in self.habitats]
-        return {
-            'id': self.id,
-            'common_name': self.common_name,
-            'species': self.species,
-            'image_link': self.image_link,
-            'habitats': habitat_id}
-
     # Formatting the data that is displayed when listing Birds
     def format(self):
         # formatting habitats

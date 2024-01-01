@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useId } from "react";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import Box from "@mui/system/Box";
@@ -6,7 +6,7 @@ import Box from "@mui/system/Box";
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
 const HabitatForm = ({
-  setHabitatsOptions = () => {},
+  setSelectedHabitats = () => {},
   setBird = () => {},
   bird,
 }) => {
@@ -94,8 +94,8 @@ const HabitatForm = ({
       const res = await response.json();
 
       if (bird) {
-        setHabitatsOptions((prev) => [
-          ...prev,
+        setSelectedHabitats((prev) => [
+          ...(prev || []),
           {
             value: res.habitat.id,
             label: res.habitat.name,
@@ -137,6 +137,7 @@ const HabitatForm = ({
         <label htmlFor="regions">Global Region:</label>
         <Select
           inputId="regions"
+          instanceId="regions"
           value={selectedRegion}
           options={regionOptions}
           onChange={(e) => {

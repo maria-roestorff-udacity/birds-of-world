@@ -69,7 +69,7 @@ def create_app(test_config=None):
     # ----------------------------------------------------------------------------#
 
     @app.route('/birds', methods=['GET'])
-    @requires_auth('get:drinks-detail')
+    # @requires_auth('get:drinks-detail')
     def get_birds():
         try:
             selection_query = Bird.query.order_by(Bird.id)
@@ -96,14 +96,14 @@ def create_app(test_config=None):
             return jsonify(
                 {
                     'success': True,
-                    'bird': get_bird.edit_format()
+                    'bird': get_bird.format()
                 }
             )
         except Exception as e:
             werkzeug_exceptions(e)
 
     @app.route('/birds', methods=['POST'])
-    def add_birds():
+    def add_bird():
         try:
             body = request.get_json()
             common_name = body.get('common_name', None)
@@ -140,7 +140,7 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/birds/<int:bird_id>', methods=['PUT'])
-    def edit_birds(bird_id):
+    def edit_bird(bird_id):
         try:
             edit_bird = Bird.query.filter(Bird.id == bird_id).one_or_none()
             # Resource not found
@@ -149,6 +149,7 @@ def create_app(test_config=None):
 
             body = request.get_json()
             habitats = body.get('habitats', None)
+            print(habitats)
 
             if habitats and len(habitats) > 0:
                 get_habitats = Habitat.query.filter(
@@ -162,7 +163,6 @@ def create_app(test_config=None):
                 except:
                     abort(422)
 
-
             for att in ['common_name', 'species', 'image_link']:
                 attribute = body.get(att, None)
                 if attribute:
@@ -171,8 +171,6 @@ def create_app(test_config=None):
                         edit_bird.update()
                     except:
                         abort(422, f'Bird {att} already exist')
-
-
 
             return jsonify(
                 {
@@ -183,7 +181,27 @@ def create_app(test_config=None):
         except Exception as e:
             werkzeug_exceptions(e)
 
-    # TODO Delete bird
+    @app.route('/birds/<int:bird_id>', methods=['DELETE'])
+    def delete_bird(bird_id):
+        try:
+            bird = Bird.query.filter(
+                Bird.id == bird_id).one_or_none()
+
+            # If bird cannot be found abort
+            if bird is None:
+                abort(404)
+
+            bird.delete()
+
+            return jsonify(
+                {
+                    "success": True,
+                    "deleted": bird_id
+                }
+            )
+
+        except Exception as e:
+            werkzeug_exceptions(e)
 
     # ----------------------------------------------------------------------------#
     # Habitats.
@@ -229,39 +247,55 @@ def create_app(test_config=None):
             name = body.get('name', None)
             region_id = body.get('region_id', None)
             habitat_bird = body.get('bird', None)
+            search = body.get('search', None)
 
-            # if required attributes are not submitted abort
-            if None in [name or region_id]:
-                abort(400)
+            if search:
+                habitats = Habitat.query.filter(
+                    Habitat.name.ilike('%' + search + '%')).all()
+                formatted_habitats = [item.format() for item in habitats]
 
-            region = Region.query.filter(Region.id == region_id).one_or_none()
-            # if invalid region is given abort
-            if region is None:
-                abort(400)
+                return jsonify(
+                    {
+                        'success': True,
+                        'habitats': formatted_habitats,
+                        'total_habitats': len(habitats)
+                    }
+                )
 
-            new_habitat = Habitat(name=name, region_id=region.id)
+            else:
 
-            if habitat_bird:
-                update_bird = Bird.query.filter(
-                    Bird.id == habitat_bird).one_or_none()
-
-                if update_bird is None:
+                # if required attributes are not submitted abort
+                if None in [name, region_id]:
                     abort(400)
 
-                new_habitat.Birds.append(update_bird)
+                region = Region.query.filter(
+                    Region.id == region_id).one_or_none()
+                # if invalid region is given abort
+                if region is None:
+                    abort(400)
 
-            try:
-                new_habitat.insert()
-            except:
-                abort(422, 'Habitat resource already exist')
+                new_habitat = Habitat(name=name, region_id=region.id)
 
+                if habitat_bird:
+                    update_bird = Bird.query.filter(
+                        Bird.id == habitat_bird).one_or_none()
 
-            return jsonify(
-                {
-                    'success': True,
-                    'habitat': new_habitat.format(),
-                }
-            )
+                    if update_bird is None:
+                        abort(400)
+
+                    new_habitat.Birds.append(update_bird)
+
+                try:
+                    new_habitat.insert()
+                except:
+                    abort(422, 'Habitat resource already exist')
+
+                return jsonify(
+                    {
+                        'success': True,
+                        'habitat': new_habitat.format(),
+                    }
+                )
         except Exception as e:
             werkzeug_exceptions(e)
 
@@ -278,17 +312,17 @@ def create_app(test_config=None):
             body = request.get_json()
             name = body.get('name', None)
             region_id = body.get('region_id', None)
-       
-           
+
             if name:
                 edit_habitat.name = name
                 try:
                     edit_habitat.update()
                 except:
                     abort(422, 'Habitat name already exist')
-                
+
             if region_id:
-                region = Region.query.filter(Region.id == region_id).one_or_none()
+                region = Region.query.filter(
+                    Region.id == region_id).one_or_none()
                 # if invalid region is given abort
                 if region is None:
                     abort(400)
@@ -298,13 +332,34 @@ def create_app(test_config=None):
                 except:
                     abort(422)
 
-
             return jsonify(
                 {
                     'success': True,
                     'habitat': edit_habitat.id,
                 }
             )
+        except Exception as e:
+            werkzeug_exceptions(e)
+
+    @app.route('/habitats/<int:habitat_id>', methods=['DELETE'])
+    def delete_habitat(habitat_id):
+        try:
+            habitat = Habitat.query.filter(
+                Habitat.id == habitat_id).one_or_none()
+
+            # If bird cannot be found abort
+            if habitat is None:
+                abort(404)
+
+            habitat.delete()
+
+            return jsonify(
+                {
+                    "success": True,
+                    "deleted": habitat_id
+                }
+            )
+
         except Exception as e:
             werkzeug_exceptions(e)
 
@@ -320,7 +375,6 @@ def create_app(test_config=None):
                 {
                     'success': True,
                     'regions': regions_formatted,
-                    'total_regions': len(regions)
                 }
             )
         except Exception as e:

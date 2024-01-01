@@ -1,9 +1,9 @@
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Select from "react-select";
 import Box from "@mui/system/Box";
 import HabitatForm from "../../components/habitat/form";
+import AsyncSelect from "react-select/async";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -12,7 +12,6 @@ const BirdsForm = () => {
 
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [habitatsOptions, setHabitatsOptions] = useState(null);
   const [selectedHabitats, setSelectedHabitats] = useState(null);
   const [value, setValue] = useState({
     common_name: "",
@@ -22,34 +21,23 @@ const BirdsForm = () => {
   });
 
   useEffect(() => {
-    fetch(`${urlBase}/habitats`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.habitats) {
-          const options = data.habitats.map((habitat) => {
-            return { value: habitat.id, label: habitat.name };
-          });
-          setHabitatsOptions(options);
-        }
-      })
-      .catch((error) => setError(error.message))
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
     if (router.isReady) {
-      const id = router.query.bird;
+      const id = router?.query?.bird;
       if (id) {
         fetch(`${urlBase}/birds/${id}`)
           .then((res) => res.json())
           .then((data) => {
             const newValue = {
-              common_name: data.bird.common_name,
-              species: data.bird.species,
-              image_link: data.bird.image_link,
-              habitats: data.bird.habitats,
+              common_name: data?.bird?.common_name,
+              species: data?.bird?.species,
+              image_link: data?.bird?.image_link,
+              habitats: data?.bird?.habitats.map((h) => h?.id),
             };
+            const options = data?.bird?.habitats.map((h) => {
+              return { value: h?.id, label: h?.name };
+            });
             setValue(newValue);
+            setSelectedHabitats(options);
           })
           .catch((error) => setError(error.message))
           .finally(() => setLoading(false));
@@ -57,20 +45,34 @@ const BirdsForm = () => {
     }
   }, [router]);
 
-  useEffect(() => {
-    if (habitatsOptions && value) {
-      const intialHabitats = habitatsOptions.filter((habitat) =>
-        value.habitats.includes(habitat.value)
-      );
-      setSelectedHabitats(intialHabitats);
-    }
-  }, [habitatsOptions, value]);
+  const promiseHabitatOptions = (inputValue) =>
+    fetch(`${urlBase}/habitats`, {
+      method: "POST",
+      body: JSON.stringify({ search: inputValue }),
+      headers: { "Content-Type": "application/json" },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (!data.success) throw new Error(data?.message || "Search Failed");
+        if (data?.habitats) {
+          const options = data?.habitats.map((h) => {
+            return { value: h?.id, label: h?.name };
+          });
+          return options;
+        }
+      })
+      .catch((error) => {
+        setError(error.message);
+        console.error(error);
+      });
 
   if (isLoading) return <p>Loading...</p>;
 
   const onSubmitBird = async (event) => {
     event.preventDefault();
-    const id = router.query.bird;
+    const id = router?.query?.bird;
+
+    console.log(value)
 
     setLoading(true);
     setError(null); // Clear previous errors when a new request starts
@@ -85,10 +87,9 @@ const BirdsForm = () => {
         body: JSON.stringify(value),
         headers: { "Content-Type": "application/json" },
       });
-      if (!response.ok) {
-        throw new Error("Failed to submit the data. Please try again.");
-      }
       res = await response.json();
+      const defaultMessage = "Submission Failed, please try again.";
+      if (!res.success) throw new Error(res?.message || defaultMessage);
     } catch (error) {
       // Capture the error message to display to the user
       setError(error.message);
@@ -155,14 +156,16 @@ const BirdsForm = () => {
             size="80"
           />
           <br />
-          <label htmlFor="habitats">Habitats:</label>
-          <Select
+          <label htmlFor="habitats">Search for Habitats:</label>
+          <AsyncSelect
             inputId="habitats"
+            instanceId="habitats"
             value={selectedHabitats}
-            options={habitatsOptions}
             onChange={onSelect}
+            cacheOptions
             isMulti
-            isSearchable
+            loadOptions={promiseHabitatOptions}
+            noOptionsMessage={() => "Search Again"}
           />
           <button type="submit" disabled={isLoading}>
             {isLoading ? "Loading..." : "Submit"}
@@ -173,7 +176,7 @@ const BirdsForm = () => {
         HINT: Cant find your Habitat? Add a new habitat below:
       </p>
       <HabitatForm
-        setHabitatsOptions={setHabitatsOptions}
+        setSelectedHabitats={setSelectedHabitats}
         setBird={setValue}
         bird={value}
       />
