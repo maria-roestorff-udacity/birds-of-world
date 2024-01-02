@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import Box from "@mui/system/Box";
 import HabitatForm from "../../components/habitat/form";
 import AsyncSelect from "react-select/async";
+import DeleteResource from "../../components/delete";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -72,13 +73,11 @@ const BirdsForm = () => {
     event.preventDefault();
     const id = router?.query?.bird;
 
-    console.log(value)
-
     setLoading(true);
-    setError(null); // Clear previous errors when a new request starts
+    setError(null); 
 
     const url = `${urlBase}/birds${id ? `/${id}` : ""}`;
-    const method = id ? "PUT" : "POST";
+    const method = id ? "PATCH" : "POST";
     let res;
 
     try {
@@ -166,11 +165,13 @@ const BirdsForm = () => {
             isMulti
             loadOptions={promiseHabitatOptions}
             noOptionsMessage={() => "Search Again"}
+            required
           />
           <button type="submit" disabled={isLoading}>
             {isLoading ? "Loading..." : "Submit"}
           </button>
         </form>
+        <DeleteResource resource="bird"/>
       </Box>
       <p style={{ fontStyle: "italic" }}>
         HINT: Cant find your Habitat? Add a new habitat below:

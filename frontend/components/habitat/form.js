@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useId } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import Box from "@mui/system/Box";
@@ -8,7 +8,8 @@ const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 const HabitatForm = ({
   setSelectedHabitats = () => {},
   setBird = () => {},
-  bird,
+  bird = null,
+  edit = false,
 }) => {
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
@@ -79,7 +80,7 @@ const HabitatForm = ({
     setError(null); // Clear previous errors when a new request starts
 
     const url = `${urlBase}/habitats${id ? `/${id}` : ""}`;
-    const method = id ? "PUT" : "POST";
+    const method = id ? "PATCH" : "POST";
 
     try {
       const response = await fetch(url, {
@@ -145,9 +146,10 @@ const HabitatForm = ({
             setValue({ ...value, region_id: e.value });
           }}
           isSearchable
+          required
         />
         <button type="submit" disabled={isLoading}>
-          {isLoading ? "Loading..." : "Add Habitat"}
+          {isLoading ? "Loading..." : `${edit ? "Edit" : "Add"} Habitat`}
         </button>
       </form>
     </Box>

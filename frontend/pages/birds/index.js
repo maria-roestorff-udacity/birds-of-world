@@ -21,11 +21,14 @@ const Birds = () => {
   }, []);
 
   if (isLoading) return <p>Loading...</p>;
-  if (!data) return <p>No profile data</p>;
+  if (!data || !data?.birds) return <p>No profile data</p>;
 
   return (
     <div>
-      <h1>Birds Of The World</h1> <Link href="birds/form">Form</Link>
+      <h1>Birds Of The World</h1>
+      <Link href="birds/form" passHref>
+        <button type="button">Add a new Bird</button>
+      </Link>
       {error && <div style={{ color: "red" }}>{error}</div>}
       <Grid container spacing={2}>
         <Grid xs={2}>
@@ -41,27 +44,27 @@ const Birds = () => {
           <h2>Regions</h2>
         </Grid>
       </Grid>
-      {data.birds.map((bird) => (
-        <Grid container spacing={3} mb={1.5} key={`${bird.common_name}`}>
+      {data?.birds.map((bird) => (
+        <Grid container spacing={3} mb={1.5} key={`${bird?.common_name}`}>
           <Grid xs={2} style={{ border: "1px solid #80808075" }}>
-            <h3>{bird.common_name}</h3>
+            <h3>{bird?.common_name}</h3>
             <br />
-            <h5 style={{ fontStyle: "italic" }}>{bird.species}</h5>
-            <Link href={`birds/form?bird=${bird.id}`}>Edit Bird</Link>
+            <h5 style={{ fontStyle: "italic" }}>{bird?.species}</h5>
+            <Link href={`birds/form?bird=${bird?.id}`}>Edit Bird</Link>
           </Grid>
           <Grid xs={3} style={{ border: "1px solid #80808075" }}>
             <img
-              src={bird.image_link}
+              src={bird?.image_link}
               alt="External Image"
               style={{ width: "100%" }}
             />
           </Grid>
           <Grid xs={3} style={{ border: "1px solid #80808075" }}>
             <Stack component="ul" spacing={1}>
-              {bird.habitats.map((habitat) => (
-                <li key={`${bird.common_name}-${habitat.id}`}>
-                  <Link href={`habitats?habitat=${habitat.id}`}>
-                    {habitat.name}
+              {bird?.habitats.map((habitat) => (
+                <li key={`${bird.common_name}-${habitat?.id}`}>
+                  <Link href={`habitats?habitat=${habitat?.id}`}>
+                    {habitat?.name}
                   </Link>
                 </li>
               ))}

@@ -124,7 +124,7 @@ The API will return three error types when requests fail:
 
 `POST '/birds'`
 
-- sends a post request in order to add a new bird
+- Sends a post request in order to add a new bird
 - Request Body:
 
 ```json
@@ -147,9 +147,9 @@ The API will return three error types when requests fail:
 
 ---
 
-`PUT '/birds/{bird_id}'`
+`PATCH '/birds/{bird_id}'`
 
-- sends a put request in order to edit a specified bird
+- sends a patch request in order to edit a specified bird
 - Request Arguments: `bird_id` - integer
 - Request Body:
 
@@ -167,6 +167,21 @@ The API will return three error types when requests fail:
 ```json
 {
   "bird": 3,
+  "success": true
+}
+```
+
+---
+
+`DELETE '/birds/{bird_id}'`
+
+- Deletes the bird that has the ID that was in the query parameter if it exists.
+- Request Arguments: `bird_id` - integer
+- Returns: the id of the deleted bird, success value
+
+```json
+{
+  "deleted": 3,
   "success": true
 }
 ```
@@ -246,7 +261,7 @@ The API will return three error types when requests fail:
 
 - Fetches a list of habitat objects that has a name key that value contains the search term that was supplied in the request argument.
 - Search term is case insensitive
-- Returns a list of question objects filtered by the specified search. And a success value, total number of habitats,
+- Returns a list of habitat objects filtered by the specified search. And a success value, total number of habitats,
 
 ```json
 {
@@ -277,9 +292,9 @@ The API will return three error types when requests fail:
 
 ---
 
-`PUT '/habitats/{habitat_id}'`
+`PATCH '/habitats/{habitat_id}'`
 
-- sends a put request in order to edit a specified habitat
+- Sends a patch request in order to edit a specified habitat
 - Request Arguments: `habitat_id` - integer
 - Request Body:
 
@@ -295,6 +310,21 @@ The API will return three error types when requests fail:
 ```json
 {
   "habitat": 3,
+  "success": true
+}
+```
+
+---
+
+`DELETE '/habitats/{habitat_id}'`
+
+- Deletes the habitat that has the ID that was in the query parameter if it exists.
+- Request Arguments: `habitat_id` - integer
+- Returns: the id of the deleted habitat, success value
+
+```json
+{
+  "deleted": 3,
   "success": true
 }
 ```

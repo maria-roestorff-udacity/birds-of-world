@@ -48,8 +48,8 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
             'habitats': [1, 2, 1000],
             'image_link': 'https://upload.wikimedia.org/wikipedia.jpg'}
 
-        self.put_bird_success = {'habitats': [1]}
-        self.put_bird_422_duplicate = {'common_name': 'Budgerigar'}
+        self.patch_bird_success = {'habitats': [1]}
+        self.patch_bird_422_duplicate = {'common_name': 'Budgerigar'}
         self.post_habitat_success = {
             'name': 'Europe',
             'region_id': 4,
@@ -60,9 +60,9 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.post_habitat_400_invalid_region = {
             'name': 'Europe',
             'region_id': 1000}
-        self.put_habitat_success = {'region_id': 7}
+        self.patch_habitat_success = {'region_id': 7}
 
-        self.put_habitat_422_duplicate_habitat = {
+        self.patch_habitat_422_duplicate_habitat = {
             'name': 'Venezuela',
             'region_id': 7}
 
@@ -128,8 +128,8 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
-    def test_put_bird(self):
-        res = self.client().put('/birds/1',  json=self.put_bird_success)
+    def test_patch_bird(self):
+        res = self.client().patch('/birds/1',  json=self.patch_bird_success)
         data = json.loads(res.data)
         total_habitats = 0
         with self.app.app_context():
@@ -139,10 +139,10 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         self.assertEqual(data['bird'], 1)
         self.assertEqual(total_habitats, len(
-            self.put_bird_success.get('habitats')))
+            self.patch_bird_success.get('habitats')))
 
-    def test_422_put_bird_duplicate(self):
-        res = self.client().put('/birds/1',  json=self.put_bird_422_duplicate)
+    def test_422_patch_bird_duplicate(self):
+        res = self.client().patch('/birds/1',  json=self.patch_bird_422_duplicate)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
@@ -155,9 +155,17 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         with self.app.app_context():
             bird = Bird.query.filter(Bird.id == delete_id).one_or_none()
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(data["success"], True)
-        self.assertEqual(data["deleted"], delete_id)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], delete_id)
         self.assertEqual(bird, None)
+
+    def test__404_delete_bird(self):
+        delete_id = 1000
+        res = self.client().delete(f'/birds/{delete_id}')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
 
     def test_paginated_habitats(self):
         res = self.client().get('/habitats?page=1', )
@@ -216,8 +224,8 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Habitat resource already exist')
 
-    def test_put_habitat(self):
-        res = self.client().put('/habitats/1',  json=self.put_habitat_success)
+    def test_patch_habitat(self):
+        res = self.client().patch('/habitats/1',  json=self.patch_habitat_success)
         data = json.loads(res.data)
         region = 0
         with self.app.app_context():
@@ -228,14 +236,32 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.assertEqual(data['habitat'], 1)
         self.assertEqual(region, 7)
 
-    def test_422_put_habitat_duplicate(self):
-        res = self.client().put('/habitats/1',  json=self.put_habitat_422_duplicate_habitat)
+    def test_422_patch_habitat_duplicate(self):
+        res = self.client().patch('/habitats/1',  json=self.patch_habitat_422_duplicate_habitat)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Habitat name already exist')
 
-    # TODO Delete Habitats
+    def test_delete_habitat(self):
+        delete_id = 1
+        res = self.client().delete(f'/habitats/{delete_id}')
+        data = json.loads(res.data)
+        with self.app.app_context():
+            habitat = Habitat.query.filter(
+                Habitat.id == delete_id).one_or_none()
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], delete_id)
+        self.assertEqual(habitat, None)
+
+    def test__404_delete_habitat(self):
+        delete_id = 1000
+        res = self.client().delete(f'/habitats/{delete_id}')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'resource not found')
 
     def test_get_regions(self):
         res = self.client().get('/regions', )

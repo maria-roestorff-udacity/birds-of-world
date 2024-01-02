@@ -60,7 +60,7 @@ def create_app(test_config=None):
             'Access-Control-Allow-Headers', 'Content-Type,Authorization,true'
         )
         response.headers.add(
-            'Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS'
+            'Access-Control-Allow-Methods', 'GET,PATCH,POST,DELETE,OPTIONS'
         )
         return response
 
@@ -87,16 +87,16 @@ def create_app(test_config=None):
     @app.route('/birds/<int:bird_id>', methods=['GET'])
     def get_specified_bird(bird_id):
         try:
-            get_bird = Bird.query.filter(Bird.id == bird_id).one_or_none()
+            bird = Bird.query.filter(Bird.id == bird_id).one_or_none()
 
             # Resource not found
-            if get_bird is None:
+            if bird is None:
                 abort(404)
 
             return jsonify(
                 {
                     'success': True,
-                    'bird': get_bird.format()
+                    'bird': bird.format()
                 }
             )
         except Exception as e:
@@ -139,7 +139,7 @@ def create_app(test_config=None):
         except Exception as e:
             werkzeug_exceptions(e)
 
-    @app.route('/birds/<int:bird_id>', methods=['PUT'])
+    @app.route('/birds/<int:bird_id>', methods=['PATCH'])
     def edit_bird(bird_id):
         try:
             edit_bird = Bird.query.filter(Bird.id == bird_id).one_or_none()
@@ -149,9 +149,8 @@ def create_app(test_config=None):
 
             body = request.get_json()
             habitats = body.get('habitats', None)
-            print(habitats)
 
-            if habitats and len(habitats) > 0:
+            if habitats is not None:
                 get_habitats = Habitat.query.filter(
                     Habitat.id.in_(habitats)).all()
                 # one of the habitats provided doesnt match the habitats in the db abort
@@ -210,13 +209,13 @@ def create_app(test_config=None):
     @app.route('/habitats', methods=['GET'])
     def get_habitats():
         try:
-            habitats = Habitat.query.order_by(Habitat.id)
-            current_habitats = paginate_items(request, habitats)
+            habitats_query = Habitat.query.order_by(Habitat.id)
+            current_habitats = paginate_items(request, habitats_query)
             return jsonify(
                 {
                     'success': True,
                     'habitats': current_habitats,
-                    'total_habitats': len(habitats.all())
+                    'total_habitats': len(habitats_query.all())
                 }
             )
         except Exception as e:
@@ -225,23 +224,23 @@ def create_app(test_config=None):
     @app.route('/habitats/<int:habitat_id>', methods=['GET'])
     def get_specified_habitat(habitat_id):
         try:
-            get_habitat = Habitat.query.filter(
+            habitat = Habitat.query.filter(
                 Habitat.id == habitat_id).one_or_none()
             # Resource not found
-            if get_habitat is None:
+            if habitat is None:
                 abort(404)
 
             return jsonify(
                 {
                     'success': True,
-                    'habitat': get_habitat.format()
+                    'habitat': habitat.format()
                 }
             )
         except Exception as e:
             werkzeug_exceptions(e)
 
     @app.route('/habitats', methods=['POST'])
-    def add_habitats():
+    def add_or_search_habitats():
         try:
             body = request.get_json()
             name = body.get('name', None)
@@ -299,7 +298,7 @@ def create_app(test_config=None):
         except Exception as e:
             werkzeug_exceptions(e)
 
-    @app.route('/habitats/<int:habitat_id>', methods=['PUT'])
+    @app.route('/habitats/<int:habitat_id>', methods=['PATCH'])
     def edit_habitats(habitat_id):
         try:
             edit_habitat = Habitat.query.filter(
@@ -385,6 +384,7 @@ def create_app(test_config=None):
     # ----------------------------------------------------------------------------#
     @app.errorhandler(400)
     def bad_request(error):
+        message = error.description
         return jsonify({
             'success': False,
             'error': 400,
@@ -420,7 +420,7 @@ def create_app(test_config=None):
         return jsonify({
             'success': False,
             'error': 422,
-            'message': error.description
+            'message':  error.description or 'unprocessable'
         }), 422
 
     @app.errorhandler(500)
