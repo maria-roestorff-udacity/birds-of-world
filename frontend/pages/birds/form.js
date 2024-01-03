@@ -74,7 +74,7 @@ const BirdsForm = () => {
     const id = router?.query?.bird;
 
     setLoading(true);
-    setError(null); 
+    setError(null);
 
     const url = `${urlBase}/birds${id ? `/${id}` : ""}`;
     const method = id ? "PATCH" : "POST";
@@ -168,10 +168,12 @@ const BirdsForm = () => {
             required
           />
           <button type="submit" disabled={isLoading}>
-            {isLoading ? "Loading..." : "Submit"}
+            {isLoading
+              ? "Loading..."
+              : `${router?.query?.bird ? "Update" : "Add"} Bird`}
           </button>
         </form>
-        <DeleteResource resource="bird"/>
+        <DeleteResource resource="bird" />
       </Box>
       <p style={{ fontStyle: "italic" }}>
         HINT: Cant find your Habitat? Add a new habitat below:

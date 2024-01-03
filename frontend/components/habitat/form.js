@@ -149,7 +149,7 @@ const HabitatForm = ({
           required
         />
         <button type="submit" disabled={isLoading}>
-          {isLoading ? "Loading..." : `${edit ? "Edit" : "Add"} Habitat`}
+          {isLoading ? "Loading..." : `${edit ? "Update" : "Add"} Habitat`}
         </button>
       </form>
     </Box>

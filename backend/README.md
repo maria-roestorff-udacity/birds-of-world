@@ -25,7 +25,7 @@ This section contains the code for the backend of the Birds of the World App. Th
 ├── requirements.txt *** dependencies to install with "pip3 install -r requirements.txt"
 ├── runtime.txt
 ├── setup.sh
-├── Procfile
+└── Procfile
 ```
 
 ## API Reference

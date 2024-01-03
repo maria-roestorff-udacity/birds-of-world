@@ -33,7 +33,11 @@ const DeleteResource = ({ resource = "habitat" }) => {
   return (
     <>
       {error && <div style={{ color: "red" }}>{error}</div>}
-      <button type="button" disabled={isLoading} onClick={onDelete}>
+      <button
+        type="button"
+        disabled={isLoading || !router.query[resource]}
+        onClick={onDelete}
+      >
         {isLoading ? "Loading..." : `Delete ${resource}`}
       </button>
     </>

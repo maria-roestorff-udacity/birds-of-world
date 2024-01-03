@@ -4,6 +4,8 @@ from unittest.mock import patch
 import json
 from app import create_app
 from models import Bird, Habitat
+import http.client
+import requests
 
 DELETE_ID = 1
 
@@ -11,6 +13,29 @@ database_path = os.environ['TEST_DATABASE_URL']
 if database_path.startswith('postgres://'):
     database_path = database_path.replace('postgres://', 'postgresql://', 1)
 
+
+AUTH0_CLIENT_ID_TEST = os.environ['AUTH0_CLIENT_ID_TEST']
+AUTH0_CLIENT_SECRET_TEST = os.environ['AUTH0_CLIENT_SECRET_TEST']
+AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
+
+payload = {'client_id': AUTH0_CLIENT_ID_TEST,
+           'client_secret': AUTH0_CLIENT_SECRET_TEST,
+           'audience': 'birds',
+           'grant_type': 'client_credentials'}
+
+headers = {'content-type': "application/json"}
+# conn = http.client.HTTPSConnection(AUTH0_DOMAIN)
+# conn.request("POST", "/oauth/token", payload, headers)
+# res1 = conn.getresponse()
+# print(res1)
+# data1 = res1.read()
+# print(data1.decode("utf-8"))
+
+url = f'https://{AUTH0_DOMAIN}/oauth/token'
+
+x = requests.post(url, headers=headers, json=payload)
+
+print(x.json())
 
 def mock_auth_decorator(f):
     def decorated_function(g):

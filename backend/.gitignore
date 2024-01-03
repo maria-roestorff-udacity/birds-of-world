@@ -3,6 +3,7 @@ __pycache__
 venv
 .venv
 auth.py
+setup.sh
 
 # OS generated files #
 ######################
