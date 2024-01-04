@@ -2,6 +2,7 @@ import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import Grid from "@mui/system/Unstable_Grid";
 import Stack from "@mui/system/Stack";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -9,8 +10,32 @@ const Birds = () => {
   const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { getAccessTokenSilently } = useAuth0();
 
   useEffect(() => {
+    const astt = async () => {
+      try {
+        const token = await getAccessTokenSilently({
+          authorizationParams: {
+            audience: "birds",
+            scope: "get:birds",
+            redirect_uri:
+              typeof window !== "undefined"
+                ? window.location.origin
+                : undefined,
+          },
+        });
+
+        console.log(token);
+      } catch (e) {
+        // Handle errors such as `login_required` and `consent_required` by re-prompting for a login
+        console.error(e);
+        console.log(e);
+      }
+    };
+
+    astt();
+
     fetch(`${urlBase}/birds`)
       .then((res) => res.json())
       .then((data) => {
@@ -18,7 +43,7 @@ const Birds = () => {
       })
       .catch((error) => setError(error.message))
       .finally(() => setLoading(false));
-  }, []);
+  }, [getAccessTokenSilently]);
 
   if (isLoading) return <p>Loading...</p>;
   if (!data || !data?.birds) return <p>No profile data</p>;

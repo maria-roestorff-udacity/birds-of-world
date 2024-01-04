@@ -69,7 +69,7 @@ def create_app(test_config=None):
     # ----------------------------------------------------------------------------#
 
     @app.route('/birds', methods=['GET'])
-    # @requires_auth('get:drinks-detail')
+    # @requires_auth('get:birds')
     def get_birds():
         try:
             selection_query = Bird.query.order_by(Bird.id)

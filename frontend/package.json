@@ -1,6 +1,7 @@
 {
-  "name": "nextjs-hello-world",
+  "name": "nextjs-birds-of-the-world",
   "version": "1.0.0",
+  "homepage": "https://127.0.0.1:3000/",
   "scripts": {
     "dev": "next",
     "build": "next build",
@@ -8,6 +9,7 @@
     "start-localhost": "next start"
   },
   "dependencies": {
+    "@auth0/auth0-react": "^2.2.4",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/system": "^5.15.2",
