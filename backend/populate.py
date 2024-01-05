@@ -50,11 +50,11 @@ def populate_birds():
         {'common_name': 'American flamingo',
          'species': 'Phoenicopterus ruber',
          'habitats': ['Galápagos Islands of Ecuador', 'Coastal Colombia', 'Venezuela', 'West Indies', 'Yucatán Peninsula', 'Southern Florida'],
-         'image': 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/American_flamingo_(Phoenicopterus_ruber).JPG/1920px-American_flamingo_(Phoenicopterus_ruber).JPG'},
+         'image': 'https://ak.picdn.net/shutterstock/videos/1032061757/thumb/1.jpg'},
         {'common_name': 'Budgerigar',
          'species': 'Melopsittacus undulatus',
          'habitats': ['Austalia'],
-         'image': 'https://upload.wikimedia.org/wikipedia/commons/2/2b/Budgerigar_diagram-labeled.svg'},
+         'image': 'https://c.pxhere.com/photos/6a/cb/budgie_bird_parakeet_animals_wildlife_photography_ziervogel_feather_creature-1386714.jpg!d'},
 
 
     ]

@@ -8,7 +8,7 @@ const DeleteResource = ({ resource = "habitat" }) => {
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { token } = useToken();
+  const { token, ownerRole } = useToken();
 
   const onDelete = async (event) => {
     event.preventDefault();
@@ -40,7 +40,7 @@ const DeleteResource = ({ resource = "habitat" }) => {
       {error && <div style={{ color: "red" }}>{error}</div>}
       <button
         type="button"
-        disabled={isLoading || !router.query[resource]}
+        disabled={isLoading || !router.query[resource] || !ownerRole}
         onClick={onDelete}
       >
         {isLoading ? "Loading..." : `Delete ${resource}`}

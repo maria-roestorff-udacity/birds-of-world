@@ -11,7 +11,7 @@ const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
 const BirdsForm = () => {
   const router = useRouter();
-  const { token } = useToken();
+  const { token, ownerRole } = useToken();
 
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -125,8 +125,6 @@ const BirdsForm = () => {
     setValue(newValue);
   };
 
-  if (isLoading) return <p>Loading...</p>;
-
   return (
     <div>
       <h1>Birds Of The World.</h1> <Link href="/birds">Back to Birds</Link>
@@ -156,6 +154,10 @@ const BirdsForm = () => {
             required
           />
           <br />
+          <p style={{ fontStyle: "italic" }}>
+            HINT: Go to your preferred image search engine. Filter for images in
+            the public domain. Copy image link in the input field.
+          </p>
           <label htmlFor="image_link">Link for bird image:</label>
           <input
             type="text"
@@ -177,8 +179,9 @@ const BirdsForm = () => {
             loadOptions={promiseHabitatOptions}
             noOptionsMessage={() => "Search Again"}
             required
+            isDisabled={!ownerRole}
           />
-          <button type="submit" disabled={isLoading}>
+          <button type="submit" disabled={isLoading || !ownerRole}>
             {isLoading
               ? "Loading..."
               : `${router?.query?.bird ? "Update" : "Add"} Bird`}

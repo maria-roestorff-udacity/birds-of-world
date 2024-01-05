@@ -10,7 +10,7 @@ const Birds = () => {
   const [data, setData] = useState(null);
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { token } = useToken();
+  const { token, ownerRole } = useToken();
 
   useEffect(() => {
     if (token) {
@@ -33,9 +33,11 @@ const Birds = () => {
   return (
     <div>
       <h1>Birds Of The World</h1>
-      <Link href="birds/form" passHref>
-        <button type="button">Add a new Bird</button>
-      </Link>
+      {ownerRole && (
+        <Link href="birds/form" passHref>
+          <button type="button">Add a new Bird</button>
+        </Link>
+      )}
       {error && <div style={{ color: "red" }}>{error}</div>}
       <Grid container spacing={2}>
         <Grid xs={2}>
@@ -57,22 +59,36 @@ const Birds = () => {
             <h3>{bird?.common_name}</h3>
             <br />
             <h5 style={{ fontStyle: "italic" }}>{bird?.species}</h5>
-            <Link href={`birds/form?bird=${bird?.id}`}>Edit Bird</Link>
+            {ownerRole && (
+              <Link href={`birds/form?bird=${bird?.id}`}>Edit Bird</Link>
+            )}
           </Grid>
           <Grid xs={3} style={{ border: "1px solid #80808075" }}>
             <img
-              src={bird?.image_link}
+              src={
+                bird?.image_link ||
+                "https://static.pexels.com/photos/139647/pexels-photo-139647-large.jpeg"
+              }
               alt="External Image"
               style={{ width: "100%" }}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src =
+                  "https://static.pexels.com/photos/139647/pexels-photo-139647-large.jpeg";
+              }}
             />
           </Grid>
           <Grid xs={3} style={{ border: "1px solid #80808075" }}>
             <Stack component="ul" spacing={1}>
               {bird?.habitats.map((habitat) => (
                 <li key={`${bird.common_name}-${habitat?.id}`}>
-                  <Link href={`habitats?habitat=${habitat?.id}`}>
-                    {habitat?.name}
-                  </Link>
+                  {ownerRole ? (
+                    <Link href={`habitats?habitat=${habitat?.id}`}>
+                      {habitat?.name}
+                    </Link>
+                  ) : (
+                    <>{habitat?.name}</>
+                  )}
                 </li>
               ))}
             </Stack>
@@ -85,6 +101,7 @@ const Birds = () => {
           >
             {bird.regions.map((region) => {
               const size = 12 / bird.regions.length;
+
               return (
                 <Grid
                   key={`${bird.common_name}-${region.name}`}
@@ -101,6 +118,21 @@ const Birds = () => {
           </Grid>
         </Grid>
       ))}
+      <p>
+        Orthographic projection from Wikipedia Commons.
+        <a
+          href="/wiki/Commons:GNU_Free_Documentation_License,_version_1.2"
+          title="Commons:GNU Free Documentation License, version 1.2"
+        >
+          GNU Free Documentation License.
+        </a>
+        <a
+          href="https://en.wikipedia.org/wiki/en:Creative_Commons"
+          title="w:en:Creative Commons"
+        >
+          Creative Commons.
+        </a>
+      </p>
     </div>
   );
 };

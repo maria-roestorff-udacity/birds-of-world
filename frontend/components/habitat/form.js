@@ -13,7 +13,7 @@ const HabitatForm = ({
   edit = false,
 }) => {
   const router = useRouter();
-  const { token } = useToken();
+  const { token, ownerRole } = useToken();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [regionOptions, setRegionOptions] = useState(null);
@@ -131,8 +131,6 @@ const HabitatForm = ({
     }
   };
 
-  if (isLoading) return <p>Loading...</p>;
-
   return (
     <Box my={2}>
       {error && <div style={{ color: "red" }}>{error}</div>}
@@ -161,7 +159,7 @@ const HabitatForm = ({
           isSearchable
           required
         />
-        <button type="submit" disabled={isLoading}>
+        <button type="submit" disabled={isLoading || !ownerRole}>
           {isLoading ? "Loading..." : `${edit ? "Update" : "Add"} Habitat`}
         </button>
       </form>

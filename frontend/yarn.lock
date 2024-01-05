@@ -456,6 +456,11 @@ is-core-module@^2.13.0:
   dependencies:
     hasown "^2.0.0"
 
+jose@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.npmjs.org/jose/-/jose-5.2.0.tgz"
+  integrity sha512-oW3PCnvyrcm1HMvGTzqjxxfnEs9EoFOFWi2HsEGhlFVOXxTE3K9GKWVMFoFw06yPUqwpvEWic1BmtUZBI/tIjw==
+
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
   version "4.0.0"
   resolved "https://registry.npmjs.org/js-tokens/-/js-tokens-4.0.0.tgz"
