@@ -1,7 +1,9 @@
 import os
 from flask_sqlalchemy import SQLAlchemy
 
-
+# ----------------------------------------------------------------------------#
+# Database setup
+# ----------------------------------------------------------------------------#
 database_path = os.environ['DATABASE_URL']
 if database_path.startswith('postgres://'):
     database_path = database_path.replace('postgres://', 'postgresql://', 1)
@@ -20,6 +22,15 @@ def setup_db(app, database_path=database_path):
         db.create_all()
 
 
+def test_db(app):
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+
+
+# ----------------------------------------------------------------------------#
+# Models
+# ----------------------------------------------------------------------------#
 '''Habitat to Bird is many to many Relationship'''
 range = db.Table('range',
                  db.Column('habitat_id', db.Integer, db.ForeignKey(

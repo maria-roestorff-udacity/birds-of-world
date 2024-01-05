@@ -3,50 +3,62 @@ import unittest
 import json
 from app import create_app
 from models import Bird, Habitat
-import requests
+from time import time
+from unittest.mock import patch
+from mock_rsa_keys import create_test_token, mock_get_jwks
 
-from dotenv import load_dotenv
-load_dotenv()
 
 database_path = os.environ['TEST_DATABASE_URL']
 if database_path.startswith('postgres://'):
     database_path = database_path.replace('postgres://', 'postgresql://', 1)
 
-AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
 API_AUDIENCE = os.environ['API_AUDIENCE']
+ALGORITHMS = os.environ['ALGORITHMS']
+AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
 
-AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
-AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
-AUTH0_OWNER_USERNAME = os.getenv('AUTH0_OWNER_USERNAME')
-AUTH0_OWNER_PASSWORD = os.getenv('AUTH0_OWNER_PASSWORD')
-AUTH0_VIEWER_USERNAME = os.getenv('AUTH0_VIEWER_USERNAME')
-AUTH0_VIEWER_PASSWORD = os.getenv('AUTH0_VIEWER_PASSWORD')
 
-owner_payload = {'client_id': f'{AUTH0_CLIENT_ID}',
-                 'client_secret': f'{AUTH0_CLIENT_SECRET}',
-                 'audience': f'{API_AUDIENCE}',
-                 'grant_type': 'password',
-                 'username': f'{AUTH0_OWNER_USERNAME}',
-                 'password': f'{AUTH0_OWNER_PASSWORD}'
-                 }
+token_payload = {
+    "iss": f"https://{AUTH0_DOMAIN}/",
+    "sub": "auth0|TestID",
+    "aud": API_AUDIENCE,
+    "iat": int(time()),
+    "exp": int(time() + 600),
+    "azp": "TestAzp",
+    "gty": "password",
+}
 
-viewer_payload = {'client_id': f'{AUTH0_CLIENT_ID}',
-                  'client_secret': f'{AUTH0_CLIENT_SECRET}',
-                  'audience': f'{API_AUDIENCE}',
-                  'grant_type': 'password',
-                  'username': f'{AUTH0_VIEWER_USERNAME}',
-                  'password': f'{AUTH0_VIEWER_PASSWORD}'
-                  }
+owner_token_payload = {
+    **token_payload,
+    "permissions": [
+        "delete:birds",
+        "delete:habitats",
+        "get:birds",
+        "get:habitats",
+        "get:regions",
+        "patch:birds",
+        "patch:habitats",
+        "post:birds",
+        "post:habitats"
+    ]
+}
+viewer_token_payload = {
+    **token_payload,
+    "permissions": [
+        "get:birds",
+        "get:habitats",
+        "get:regions",
+    ]
+}
 
-headers = {'content-type': "application/json"}
+# create tokens signed with dummy private rsa key
+owner_access_token = create_test_token(
+    owner_token_payload, algorithm=ALGORITHMS)
+viewer_access_token = create_test_token(
+    viewer_token_payload, algorithm=ALGORITHMS)
 
-url = f'https://{AUTH0_DOMAIN}/oauth/token'
-
-owner_role = requests.post(url, headers=headers, json=owner_payload)
-viewer_role = requests.post(url, headers=headers, json=viewer_payload)
-
-owner_access_token = owner_role.json().get('access_token', None)
-viewer_access_token = viewer_role.json().get('access_token', None)
+# mocks the function that gets authorization from your Auth0 account
+# instead use dummy public rsa key to decode token
+patch('auth.get_jwks', mock_get_jwks).start()
 
 headers_owner = {'Authorization': f'Bearer {owner_access_token}'}
 headers_viewers = {'HTTP_AUTHORIZATION': f'Bearer {viewer_access_token}'}

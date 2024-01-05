@@ -12,6 +12,7 @@ if database_path.startswith('postgres://'):
 
 
 def mock_auth_decorator(permission):
+
     def decorated_function(undec_func):
         @wraps(undec_func)
         def wrapper(*args, **kwargs):

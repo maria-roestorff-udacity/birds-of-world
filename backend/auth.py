@@ -25,8 +25,6 @@ class AuthError(Exception):
 def get_token_auth_header():
     auth = request.headers.get('Authorization', None)
 
-    # print(request.headers)
-
     if not auth:
         raise AuthError({
             'code': 'authorization_header_missing',
@@ -67,11 +65,12 @@ def check_permissions(permission, payload):
         abort(403)
     return True
 
+def get_jwks():
+    jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    return json.loads(jsonurl.read())
 
 def verify_decode_jwt(token):
-    jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
-    jwks = json.loads(jsonurl.read())
-
+    jwks = get_jwks()
     try:
         unverified_header = jwt.get_unverified_header(token)
         rsa_key = {}
@@ -98,7 +97,7 @@ def verify_decode_jwt(token):
                     rsa_key,
                     algorithms=ALGORITHMS,
                     audience=API_AUDIENCE,
-                    issuer='https://' + AUTH0_DOMAIN + '/'
+                    issuer='https://' + AUTH0_DOMAIN + '/',
                 )
                 return payload
 

@@ -74,6 +74,7 @@ def populate_birds():
 if __name__ == '__main__':
     populate_region()
     populate_habitats()
+    populate_birds()
 
 # curl http://127.0.0.1:5000/movies -X POST -H "Content-Type: application/json" -d '{"title":"Movie1", "actors":[1]}'
 # curl http://127.0.0.1:5000/actors -X POST -H "Content-Type: application/json" -d '{"name":"John Doe"}'

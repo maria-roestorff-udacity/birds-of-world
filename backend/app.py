@@ -1,9 +1,8 @@
 # ----------------------------------------------------------------------------#
 # Imports
 # ----------------------------------------------------------------------------#
-import os
 from flask import Flask, jsonify, request, abort
-from models import setup_db, Region, Habitat, Bird
+from models import setup_db, test_db, Region, Habitat, Bird
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 from populate import populate_region, populate_habitats, populate_birds
@@ -45,14 +44,20 @@ def create_app(test_config=None):
     app = Flask(__name__)
     if test_config is not None:
         setup_db(app, test_config)
+        test_db(app)
+        with app.app_context():
+            populate_region()
+            populate_habitats()
+            populate_birds()
     else:
         setup_db(app)
-    CORS(app, origins="*")
+        with app.app_context():
+            populate_region()
+            populate_habitats()
+            populate_birds()
+        
 
-    with app.app_context():
-        populate_region()
-        populate_habitats()
-        populate_birds()
+    CORS(app, origins="*")
 
     @app.after_request
     def after_request(response):

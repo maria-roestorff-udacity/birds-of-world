@@ -18,9 +18,9 @@ This section contains the code for the backend of the Birds of the World App. Th
 ├── app.py *** the main controller and driver of the server.
                     "python app.py" to run after installing dependencies
 ├── models.py *** contains the SQLAlchemy models.
-├── manage.py *** manage the database migrations.
 ├── auth.py *** integration with Auth0 for authentication.
-├── test.py *** unittests to test the server.
+├── test_rbac.py *** unittests to test the server.
+├── test_no_auth.py *** unittests without authentication.
 ├── populate.py *** initially seed our database and test database.
 ├── requirements.txt *** dependencies to install with "pip3 install -r requirements.txt"
 ├── runtime.txt
@@ -398,6 +398,22 @@ source .venv/bin/activate
 which python3 # Check filepath is current and correct
 ```
 
+### Environment Secrets
+
+Secrets in the setup.sh
+
+```bash
+chmod +x setup.sh
+```
+
+```
+export DATABASE_URL=
+export TEST_DATABASE_URL=
+export AUTH0_DOMAIN=
+export ALGORITHMS=
+export API_AUDIENCE=
+```
+
 ### Install Dependencies
 
 ```bash
@@ -433,6 +449,7 @@ In order to run tests navigate to the backend directory and run the following co
 ```bash
 dropdb testbotwdb
 createdb testbotwdb
-python3 test.py
+python3 test_rbac.py
 ```
+
 _Note:_ The tests works with Authentication and permission roles. Thats why all the secret environments should be defined. It is possible to run `test_no_auth.py` for tests without authentication.
