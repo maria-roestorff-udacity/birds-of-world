@@ -1,59 +1,30 @@
 import os
 import unittest
+from unittest.mock import patch
 import json
 from app import create_app
 from models import Bird, Habitat
-import requests
-
-from dotenv import load_dotenv
-load_dotenv()
+from functools import wraps
 
 database_path = os.environ['TEST_DATABASE_URL']
 if database_path.startswith('postgres://'):
     database_path = database_path.replace('postgres://', 'postgresql://', 1)
 
-AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
-API_AUDIENCE = os.environ['API_AUDIENCE']
 
-AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
-AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
-AUTH0_OWNER_USERNAME = os.getenv('AUTH0_OWNER_USERNAME')
-AUTH0_OWNER_PASSWORD = os.getenv('AUTH0_OWNER_PASSWORD')
-AUTH0_VIEWER_USERNAME = os.getenv('AUTH0_VIEWER_USERNAME')
-AUTH0_VIEWER_PASSWORD = os.getenv('AUTH0_VIEWER_PASSWORD')
-
-owner_payload = {'client_id': f'{AUTH0_CLIENT_ID}',
-                 'client_secret': f'{AUTH0_CLIENT_SECRET}',
-                 'audience': f'{API_AUDIENCE}',
-                 'grant_type': 'password',
-                 'username': f'{AUTH0_OWNER_USERNAME}',
-                 'password': f'{AUTH0_OWNER_PASSWORD}'
-                 }
-
-viewer_payload = {'client_id': f'{AUTH0_CLIENT_ID}',
-                  'client_secret': f'{AUTH0_CLIENT_SECRET}',
-                  'audience': f'{API_AUDIENCE}',
-                  'grant_type': 'password',
-                  'username': f'{AUTH0_VIEWER_USERNAME}',
-                  'password': f'{AUTH0_VIEWER_PASSWORD}'
-                  }
-
-headers = {'content-type': "application/json"}
-
-url = f'https://{AUTH0_DOMAIN}/oauth/token'
-
-owner_role = requests.post(url, headers=headers, json=owner_payload)
-viewer_role = requests.post(url, headers=headers, json=viewer_payload)
-
-owner_access_token = owner_role.json().get('access_token', None)
-viewer_access_token = viewer_role.json().get('access_token', None)
-
-headers_owner = {'Authorization': f'Bearer {owner_access_token}'}
-headers_viewers = {'HTTP_AUTHORIZATION': f'Bearer {viewer_access_token}'}
+def mock_auth_decorator(permission):
+    def decorated_function(undec_func):
+        @wraps(undec_func)
+        def wrapper(*args, **kwargs):
+            return undec_func(payload='', *args, **kwargs)
+        return wrapper
+    return decorated_function
 
 
-class BirdsOfTWorldsTestCase(unittest.TestCase):
-    '''This class represents the birds of the world test case'''
+patch('app.requires_auth', mock_auth_decorator).start()
+
+
+class BirdsOfTWorldsTestWithoutAuthCase(unittest.TestCase):
+    '''This class represents the birds of the world test case without authenication'''
 
     def setUp(self):
         '''Define test variables and initialize app.'''
@@ -94,82 +65,47 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         pass
 
     # ----------------------------------------------------------------------------#
-    # RBAC Tests
-    # ----------------------------------------------------------------------------#
-
-    def test_viewer_role_get_birds(self):
-        res = self.client().get(
-            '/birds?page=1', environ_base=headers_viewers)
-        data = json.loads(res.data)
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['success'], True)
-
-    def test_401_RBAC_birds_invalid_token(self):
-        res = self.client().get(
-            '/birds?page=1', environ_base={'HTTP_AUTHORIZATION': 'Bearer eyeyeyeyey'})
-        data = json.loads(res.data)
-        self.assertEqual(res.status_code, 401)
-        self.assertEqual(data['success'], False)
-
-    def test_owner_role_post_bird(self):
-        res = self.client().post('/birds',  json=self.post_bird_success,
-                                 headers=headers_owner)
-        data = json.loads(res.data)
-        self.assertEqual(res.status_code, 200)
-        self.assertEqual(data['success'], True)
-
-    def test_403_RBAC_post_bird(self):
-        res = self.client().post('/birds',  json=self.post_bird_success,
-                                 headers={'Authorization': f'Bearer {viewer_access_token}'})
-        data = json.loads(res.data)
-        self.assertEqual(res.status_code, 403)
-        self.assertEqual(data['success'], False)
-
-    # ----------------------------------------------------------------------------#
     # Bird Endpoint Tests
     # ----------------------------------------------------------------------------#
 
     def test_paginated_birds(self):
-        res = self.client().get(
-            '/birds?page=1', environ_base=headers_viewers)
+        res = self.client().get('/birds?page=1')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertGreater(data['total_birds'], 1)
 
     def test_404_beyond_paginated_birds(self):
-        res = self.client().get('/birds?page=1000', environ_base=headers_viewers)
+        res = self.client().get('/birds?page=1000')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
     def test_get_specific_bird(self):
-        res = self.client().get('/birds/1', environ_base=headers_viewers)
+        res = self.client().get('/birds/1')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['bird'])
 
     def test_404_invalid_bird(self):
-        res = self.client().get('/birds/100',
-                                environ_base=headers_viewers)
+        res = self.client().get('/birds/100')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
     def test_post_bird(self):
-        res = self.client().post('/birds',  json=self.post_bird_success,
-                                 headers=headers_owner)
+        res = self.client().post('/birds',  json=self.post_bird_success)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertEqual(data['bird'], 3)
 
     def test_422_post_duplicate_bird(self):
-        self.client().post('/birds',  json=self.post_bird_success, headers=headers_owner)
-        res = self.client().post('/birds',  json=self.post_bird_success, headers=headers_owner)
+        self.client().post('/birds',  json=self.post_bird_success)
+        res = self.client().post('/birds',  json=self.post_bird_success)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
@@ -177,7 +113,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_400_post_bird_missing_atrribute(self):
         res = self.client().post(
-            '/birds',  json=self.post_bird_400_missing_atrribute, headers=headers_owner)
+            '/birds',  json=self.post_bird_400_missing_atrribute)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
@@ -185,7 +121,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_404_post_bird_habitats_not_found(self):
         res = self.client().post(
-            '/birds',  json=self.post_bird_404_habitats_not_found, headers=headers_owner)
+            '/birds',  json=self.post_bird_404_habitats_not_found)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
@@ -193,7 +129,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_patch_bird(self):
         res = self.client().patch(
-            '/birds/1',  json=self.patch_bird_success, headers=headers_owner)
+            '/birds/1',  json=self.patch_bird_success)
         data = json.loads(res.data)
         total_habitats = 0
         with self.app.app_context():
@@ -207,7 +143,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_422_patch_bird_duplicate(self):
         res = self.client().patch(
-            '/birds/1',  json=self.patch_bird_422_duplicate, headers=headers_owner)
+            '/birds/1',  json=self.patch_bird_422_duplicate)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
@@ -216,7 +152,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
     def test_delete_bird(self):
         delete_id = 1
         res = self.client().delete(
-            f'/birds/{delete_id}', headers=headers_owner)
+            f'/birds/{delete_id}')
         data = json.loads(res.data)
         with self.app.app_context():
             bird = Bird.query.filter(Bird.id == delete_id).one_or_none()
@@ -227,8 +163,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test__404_delete_bird(self):
         delete_id = 1000
-        res = self.client().delete(
-            f'/birds/{delete_id}', headers=headers_owner)
+        res = self.client().delete(f'/birds/{delete_id}')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
@@ -239,32 +174,28 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
     # ----------------------------------------------------------------------------#
 
     def test_paginated_habitats(self):
-        res = self.client().get('/habitats?page=1',
-                                environ_base=headers_viewers)
+        res = self.client().get('/habitats?page=1')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertGreater(data['total_habitats'], 1)
 
     def test_404_beyond_paginated_habitats(self):
-        res = self.client().get('/habitats?page=1000',
-                                environ_base=headers_viewers)
+        res = self.client().get('/habitats?page=1000')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'resource not found')
 
     def test_specific_habitat(self):
-        res = self.client().get('/habitats/1',
-                                environ_base=headers_viewers)
+        res = self.client().get('/habitats/1')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['habitat'])
 
     def test_404_invalid_habitat(self):
-        res = self.client().get('/habitats/1000',
-                                environ_base=headers_viewers)
+        res = self.client().get('/habitats/1000')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
@@ -272,7 +203,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_post_habitat(self):
         res = self.client().post(
-            '/habitats',  json=self.post_habitat_success, headers=headers_owner)
+            '/habitats',  json=self.post_habitat_success)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -280,7 +211,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_post_search_habitat(self):
         res = self.client().post(
-            '/habitats',  json=self.post_search_habitat_success, headers=headers_owner)
+            '/habitats',  json=self.post_search_habitat_success)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -288,24 +219,24 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_400_post_habitat_invalid_region(self):
         res = self.client().post(
-            '/habitats',  json=self.post_habitat_400_invalid_region, headers=headers_owner)
+            '/habitats',  json=self.post_habitat_400_invalid_region)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'bad request')
 
     def test_422_post_duplicate_habitat(self):
-        self.client().post('/habitats',  json=self.post_habitat_success, headers=headers_owner)
+        self.client().post('/habitats',  json=self.post_habitat_success)
         res = self.client().post(
-            '/habitats',  json=self.post_habitat_success, headers=headers_owner)
-        data = json.loads(res.data)
+            '/habitats',  json=self.post_habitat_success)
+        data = json.loads(res.data.decode())
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'Habitat resource already exist')
 
     def test_patch_habitat(self):
         res = self.client().patch(
-            '/habitats/1',  json=self.patch_habitat_success, headers=headers_owner)
+            '/habitats/1',  json=self.patch_habitat_success)
         data = json.loads(res.data)
         region = 0
         with self.app.app_context():
@@ -317,8 +248,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.assertEqual(region, 7)
 
     def test_422_patch_habitat_duplicate(self):
-        res = self.client().patch('/habitats/1',
-                                  json=self.patch_habitat_422_duplicate_habitat, headers=headers_owner)
+        res = self.client().patch('/habitats/1', json=self.patch_habitat_422_duplicate_habitat)
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
@@ -326,8 +256,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_delete_habitat(self):
         delete_id = 1
-        res = self.client().delete(
-            f'/habitats/{delete_id}', headers=headers_owner)
+        res = self.client().delete(f'/habitats/{delete_id}')
         data = json.loads(res.data)
         with self.app.app_context():
             habitat = Habitat.query.filter(
@@ -339,8 +268,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
 
     def test_404_delete_habitat(self):
         delete_id = 1000
-        res = self.client().delete(
-            f'/habitats/{delete_id}', headers=headers_owner)
+        res = self.client().delete(f'/habitats/{delete_id}')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
@@ -351,17 +279,10 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
     # ----------------------------------------------------------------------------#
 
     def test_get_regions(self):
-        res = self.client().get(
-            '/regions', environ_base=headers_viewers)
+        res = self.client().get('/regions')
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-
-    def test_401_RBAC_get_regions(self):
-        res = self.client().get('/regions')
-        data = json.loads(res.data)
-        self.assertEqual(res.status_code, 401)
-        self.assertEqual(data['success'], False)
 
 
 # Make the tests conveniently executable

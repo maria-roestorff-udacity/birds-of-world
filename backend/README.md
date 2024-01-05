@@ -435,3 +435,4 @@ dropdb testbotwdb
 createdb testbotwdb
 python3 test.py
 ```
+_Note:_ The tests works with Authentication and permission roles. Thats why all the secret environments should be defined. It is possible to run `test_no_auth.py` for tests without authentication.

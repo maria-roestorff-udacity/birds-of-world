@@ -4,7 +4,7 @@ The Birds of the World App was an initiative by birds watchers that wanted to cr
 
 The Birds of the World App allows users to take their favourite birds and add these birds to the Birds of the World App. Information on where to find these birds (**habitats**) is used to help track them. Habitats are sorted into **global regions**. A bird can be found in many habitats. And a habitat can have many birds.
 
-Adding new birds can be completed on the **birds/form** page. The user needs to provide the common name, species, and a link to an image of the bird. The user also needs specify in which habitats the birds can be found in. If the bird is found in a new habitat, the user can click on the edit bird button to update the bird information. The users can go to the **birds** page to view all the birds.
+Viewer and owner users can go to the **birds** page to view all the existing birds. Only owner users can add new birds on the **birds/form** page. The owner user needs to provide the common name, species, and a link to an image of the bird. The owner user also needs to specify in which habitats the birds can be found. If the bird is found in a new habitat, the owner user can click on the edit bird button to update the bird information.
 
 All backend code follows [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/).
 The frontend is built with React in Javascript and the backend is a Flask app that uses SQLAlchemy as the ORM and postgres as the database.
@@ -69,6 +69,26 @@ The frontend is built with React in Javascript and the backend is a Flask app th
 
 - Base URL: TODO At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, `http://127.0.0.1:5000/`, which is set as a proxy in the frontend configuration.
 - Authentication: This version of the application does not require authentication or API keys.
+
+### Roles: `Owners` and `Viewers`
+
+#### Viewers Permissions
+
+- get:birds
+- get:habitats
+- get:regions
+
+#### Owners Permissions
+
+- get:birds
+- get:habitats
+- get:regions
+- post:birds
+- post:habitats
+- patch:birds
+- patch:habitats
+- delete:birds
+- delete:habitats
 
 ### Error Handling
 
@@ -470,6 +490,8 @@ dropdb testbotwdb
 createdb testbotwdb
 python3 test.py
 ```
+
+_Note:_ The tests works with Authentication and permission roles. Thats why all the secret environments should be defined. It is possible to run `test_no_auth.py` for tests without authentication.
 
 ## Frontend Development Setup
 

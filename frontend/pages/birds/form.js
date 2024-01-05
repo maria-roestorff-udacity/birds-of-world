@@ -5,11 +5,13 @@ import Box from "@mui/system/Box";
 import HabitatForm from "../../components/habitat/form";
 import AsyncSelect from "react-select/async";
 import DeleteResource from "../../components/delete";
+import { useToken } from "../../components/tokenContext";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
 const BirdsForm = () => {
   const router = useRouter();
+  const { token } = useToken();
 
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -22,10 +24,13 @@ const BirdsForm = () => {
   });
 
   useEffect(() => {
-    if (router.isReady) {
+    if (router.isReady && token) {
       const id = router?.query?.bird;
       if (id) {
-        fetch(`${urlBase}/birds/${id}`)
+        setLoading(true);
+        fetch(`${urlBase}/birds/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
           .then((res) => res.json())
           .then((data) => {
             const newValue = {
@@ -44,17 +49,20 @@ const BirdsForm = () => {
           .finally(() => setLoading(false));
       }
     }
-  }, [router]);
+  }, [router, token]);
 
   const promiseHabitatOptions = (inputValue) =>
     fetch(`${urlBase}/habitats`, {
       method: "POST",
       body: JSON.stringify({ search: inputValue }),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     })
       .then((res) => res.json())
       .then((data) => {
-        if (!data.success) throw new Error(data?.message || "Search Failed");
+        if (!data?.success) throw new Error(data?.message || "Search Failed");
         if (data?.habitats) {
           const options = data?.habitats.map((h) => {
             return { value: h?.id, label: h?.name };
@@ -66,8 +74,6 @@ const BirdsForm = () => {
         setError(error.message);
         console.error(error);
       });
-
-  if (isLoading) return <p>Loading...</p>;
 
   const onSubmitBird = async (event) => {
     event.preventDefault();
@@ -84,7 +90,10 @@ const BirdsForm = () => {
       const response = await fetch(url, {
         method,
         body: JSON.stringify(value),
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
       res = await response.json();
       const defaultMessage = "Submission Failed, please try again.";
@@ -115,6 +124,8 @@ const BirdsForm = () => {
     const newValue = { ...value, habitats: newHabitats };
     setValue(newValue);
   };
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <div>

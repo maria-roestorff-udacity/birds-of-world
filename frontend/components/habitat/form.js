@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import Box from "@mui/system/Box";
+import { useToken } from "../tokenContext";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -12,6 +13,7 @@ const HabitatForm = ({
   edit = false,
 }) => {
   const router = useRouter();
+  const { token } = useToken();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [regionOptions, setRegionOptions] = useState(null);
@@ -23,19 +25,24 @@ const HabitatForm = ({
   });
 
   useEffect(() => {
-    fetch(`${urlBase}/regions`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.regions) {
-          const options = data.regions.map((item) => {
-            return { value: item.id, label: item.name };
-          });
-          setRegionOptions(options);
-        }
+    if (token) {
+      setLoading(true);
+      fetch(`${urlBase}/regions`, {
+        headers: { Authorization: `Bearer ${token}` },
       })
-      .catch((error) => setError(error.message))
-      .finally(() => setLoading(false));
-  }, []);
+        .then((res) => res.json())
+        .then((data) => {
+          if (data?.regions) {
+            const options = data?.regions.map((item) => {
+              return { value: item?.id, label: item?.name };
+            });
+            setRegionOptions(options);
+          }
+        })
+        .catch((error) => setError(error?.message))
+        .finally(() => setLoading(false));
+    }
+  }, [token]);
 
   useEffect(() => {
     if (router.isReady) {
@@ -44,22 +51,25 @@ const HabitatForm = ({
         setValue({ ...value, bird: bird_id });
       }
       const habitat_id = router.query.habitat;
-      if (habitat_id) {
-        fetch(`${urlBase}/habitats/${habitat_id}`)
+      if (habitat_id && token) {
+        setLoading(true);
+        fetch(`${urlBase}/habitats/${habitat_id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
           .then((res) => res.json())
           .then((data) => {
             const newValue = {
-              name: data.habitat.name,
-              region_id: data.habitat.region_id,
+              name: data?.habitat?.name,
+              region_id: data?.habitat?.region_id,
               bird: "",
             };
             setValue(newValue);
           })
-          .catch((error) => setError(error.message))
+          .catch((error) => setError(error?.message))
           .finally(() => setLoading(false));
       }
     }
-  }, [router]);
+  }, [router, token]);
 
   useEffect(() => {
     if (regionOptions && value) {
@@ -69,8 +79,6 @@ const HabitatForm = ({
       setSelectedRegion(intialRegion);
     }
   }, [regionOptions, value]);
-
-  if (isLoading) return <p>Loading...</p>;
 
   const onSubmitHabitat = async (event) => {
     event.preventDefault();
@@ -86,7 +94,10 @@ const HabitatForm = ({
       const response = await fetch(url, {
         method,
         body: JSON.stringify(value),
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (!response.ok) {
         throw new Error("Failed to submit the data. Please try again.");
@@ -119,6 +130,8 @@ const HabitatForm = ({
       setLoading(false);
     }
   };
+
+  if (isLoading) return <p>Loading...</p>;
 
   return (
     <Box my={2}>

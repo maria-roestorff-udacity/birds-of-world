@@ -1,12 +1,11 @@
 import Router from "next/router";
 import { Auth0Provider } from "@auth0/auth0-react";
+import TokenContextProvider from "../components/tokenContext";
 
 const onRedirectCallback = (appState) => {
   // Use Next.js's Router.replace method to replace the url
   Router.replace(appState?.returnTo || "/");
 };
-
-console.log();
 
 export default function MyApp({ Component, pageProps }) {
   return (
@@ -19,9 +18,10 @@ export default function MyApp({ Component, pageProps }) {
           typeof window !== "undefined" ? window.location.origin : undefined,
         prompt: "consent",
       }}
-      ge
     >
-      <Component {...pageProps} />
+      <TokenContextProvider>
+        <Component {...pageProps} />
+      </TokenContextProvider>
     </Auth0Provider>
   );
 }

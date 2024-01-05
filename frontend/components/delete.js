@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import { useToken } from "./tokenContext";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -7,6 +8,7 @@ const DeleteResource = ({ resource = "habitat" }) => {
   const router = useRouter();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { token } = useToken();
 
   const onDelete = async (event) => {
     event.preventDefault();
@@ -17,7 +19,10 @@ const DeleteResource = ({ resource = "habitat" }) => {
     try {
       const response = await fetch(`${urlBase}/${resource}s/${id}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (!response.ok) throw new Error("Delete Failed. Please try again.");
     } catch (error) {

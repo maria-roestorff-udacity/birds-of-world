@@ -69,8 +69,8 @@ def create_app(test_config=None):
     # ----------------------------------------------------------------------------#
 
     @app.route('/birds', methods=['GET'])
-    # @requires_auth('get:birds')
-    def get_birds():
+    @requires_auth('get:birds')
+    def get_birds(payload):
         try:
             selection_query = Bird.query.order_by(Bird.id)
             current_birds = paginate_items(request, selection_query)
@@ -85,7 +85,8 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/birds/<int:bird_id>', methods=['GET'])
-    def get_specified_bird(bird_id):
+    @requires_auth('get:birds')
+    def get_specified_bird(payload, bird_id):
         try:
             bird = Bird.query.filter(Bird.id == bird_id).one_or_none()
 
@@ -103,7 +104,8 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/birds', methods=['POST'])
-    def add_bird():
+    @requires_auth('post:birds')
+    def add_bird(payload):
         try:
             body = request.get_json()
             common_name = body.get('common_name', None)
@@ -140,7 +142,8 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/birds/<int:bird_id>', methods=['PATCH'])
-    def edit_bird(bird_id):
+    @requires_auth('patch:birds')
+    def edit_bird(payload, bird_id):
         try:
             edit_bird = Bird.query.filter(Bird.id == bird_id).one_or_none()
             # Resource not found
@@ -181,7 +184,8 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/birds/<int:bird_id>', methods=['DELETE'])
-    def delete_bird(bird_id):
+    @requires_auth('delete:birds')
+    def delete_bird(payload, bird_id):
         try:
             bird = Bird.query.filter(
                 Bird.id == bird_id).one_or_none()
@@ -207,7 +211,8 @@ def create_app(test_config=None):
     # ----------------------------------------------------------------------------#
 
     @app.route('/habitats', methods=['GET'])
-    def get_habitats():
+    @requires_auth('get:habitats')
+    def get_habitats(payload):
         try:
             habitats_query = Habitat.query.order_by(Habitat.id)
             current_habitats = paginate_items(request, habitats_query)
@@ -222,7 +227,8 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/habitats/<int:habitat_id>', methods=['GET'])
-    def get_specified_habitat(habitat_id):
+    @requires_auth('get:habitats')
+    def get_specified_habitat(payload, habitat_id):
         try:
             habitat = Habitat.query.filter(
                 Habitat.id == habitat_id).one_or_none()
@@ -240,7 +246,8 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/habitats', methods=['POST'])
-    def add_or_search_habitats():
+    @requires_auth('post:habitats')
+    def add_or_search_habitats(payload):
         try:
             body = request.get_json()
             name = body.get('name', None)
@@ -299,7 +306,8 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/habitats/<int:habitat_id>', methods=['PATCH'])
-    def edit_habitats(habitat_id):
+    @requires_auth('patch:habitats')
+    def edit_habitats(payload, habitat_id):
         try:
             edit_habitat = Habitat.query.filter(
                 Habitat.id == habitat_id).one_or_none()
@@ -341,7 +349,8 @@ def create_app(test_config=None):
             werkzeug_exceptions(e)
 
     @app.route('/habitats/<int:habitat_id>', methods=['DELETE'])
-    def delete_habitat(habitat_id):
+    @requires_auth('delete:habitats')
+    def delete_habitat(payload, habitat_id):
         try:
             habitat = Habitat.query.filter(
                 Habitat.id == habitat_id).one_or_none()
@@ -366,7 +375,8 @@ def create_app(test_config=None):
     # Regions.
     # ----------------------------------------------------------------------------#
     @app.route('/regions', methods=['GET'])
-    def get_regions():
+    @requires_auth('get:regions')
+    def get_regions(payload):
         try:
             regions = Region.query.order_by(Region.id).all()
             regions_formatted = [region.format() for region in regions]
