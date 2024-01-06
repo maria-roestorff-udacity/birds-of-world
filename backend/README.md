@@ -32,8 +32,29 @@ This section contains the code for the backend of the Birds of the World App. Th
 
 ### Getting Started
 
-- Base URL: TODO At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, `http://127.0.0.1:5000/`, which is set as a proxy in the frontend configuration.
-- Authentication: This version of the application does not require authentication or API keys.
+- Backend URL: TODO
+- Frontend URL:
+- Authentication: TODO
+
+### Roles: `Owners` and `Viewers`
+
+#### Viewers Permissions
+
+- get:birds
+- get:habitats
+- get:regions
+
+#### Owners Permissions
+
+- get:birds
+- get:habitats
+- get:regions
+- post:birds
+- post:habitats
+- patch:birds
+- patch:habitats
+- delete:birds
+- delete:habitats
 
 ### Error Handling
 
@@ -405,6 +426,8 @@ Secrets in the setup.sh
 ```bash
 chmod +x setup.sh
 ```
+
+If you want to run this repo locally with your own OAuth credentials you need to export the following environment variables
 
 ```
 export DATABASE_URL=

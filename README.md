@@ -35,6 +35,7 @@ The frontend is built with React in Javascript and the backend is a Flask app th
     │   │   ├── form.js
     │   │   └── index.js
     │   ├── habitats
+    │   │   ├── form.js
     │   │   └── index.js
     │   └── index.js
     ├── packages.json
@@ -67,8 +68,9 @@ The frontend is built with React in Javascript and the backend is a Flask app th
 
 ### Getting Started
 
-- Base URL: TODO At present this app can only be run locally and is not hosted as a base URL. The backend app is hosted at the default, `http://127.0.0.1:5000/`, which is set as a proxy in the frontend configuration.
-- Authentication: This version of the application does not require authentication or API keys.
+- Backend URL: TODO
+- Frontend URL:
+- Authentication: TODO
 
 ### Roles: `Owners` and `Viewers`
 
@@ -460,6 +462,8 @@ Secrets in the setup.sh
 ```bash
 chmod +x setup.sh
 ```
+
+If you want to run this repo locally with your own OAuth credentials you need to export the following environment variables
 
 ```
 export DATABASE_URL=

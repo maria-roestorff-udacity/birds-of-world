@@ -21,6 +21,7 @@ This section contains the code for the frontend of the Birds of the World App. T
 │   │   ├── form.js
 │   │   └── index.js
 │   ├── habitats
+│   │   ├── form.js
 │   │   └── index.js
 │   └── index.js
 ├── packages.json
