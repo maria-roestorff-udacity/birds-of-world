@@ -15,7 +15,7 @@ const Habitat = () => {
       <Typography variant="h1" gutterBottom>
         Birds Of The World.
       </Typography>
-      <Stack direction="row" justifyContent="space-between" pb={2}>
+      <Stack direction="row" justifyContent="space-between" pb={4}>
         <Link href="/birds" passHref>
           <Button endIcon={<FavoriteBorderSharpIcon />}>Back to Birds</Button>
         </Link>

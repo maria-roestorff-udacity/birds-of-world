@@ -32,7 +32,6 @@ const Birds = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setData(data);
         })
         .catch((error) => setError(error.message))
@@ -51,9 +50,9 @@ const Birds = () => {
   return (
     <Container maxWidth="lg">
       <Typography variant="h1" gutterBottom>
-        Birds Of The World
+        Birds Of The World.
       </Typography>
-      <Stack direction="row" justifyContent="space-between">
+      <Stack direction="row" justifyContent="space-between" pb={2}>
         {ownerRole && (
           <Link href="birds/form" passHref>
             <Button endIcon={<AddCircleOutlineIcon />}>Add a new Bird</Button>
@@ -80,9 +79,9 @@ const Birds = () => {
       </Grid>
       <Box
         sx={{
-          borderColor: "text.primary",
           borderTop: "1px solid",
           borderRight: "1px solid",
+          borderColor: "grey.600",
         }}
       >
         {data?.birds.map((bird) => (
@@ -91,15 +90,15 @@ const Birds = () => {
             spacing={0}
             key={`${bird?.common_name}`}
             sx={{
-              borderColor: "text.primary",
               borderBottom: "1px solid",
+              borderColor: "grey.600",
             }}
           >
             <Grid
               xs={2}
               sx={{
-                borderColor: "text.primary",
                 borderLeft: "1px solid",
+                borderColor: "grey.600",
               }}
             >
               <Stack p={1} spacing={2}>
@@ -115,8 +114,8 @@ const Birds = () => {
             <Grid
               xs={3}
               sx={{
-                borderColor: "text.primary",
                 borderLeft: "1px solid",
+                borderColor: "grey.600",
               }}
             >
               <img
@@ -124,7 +123,8 @@ const Birds = () => {
                   bird?.image_link ||
                   "https://static.pexels.com/photos/139647/pexels-photo-139647-large.jpeg"
                 }
-                alt="External Image"
+                title={bird?.common_name}
+                alt={bird?.common_name}
                 style={{ width: "100%" }}
                 onError={(e) => {
                   e.currentTarget.onerror = null;
@@ -136,8 +136,8 @@ const Birds = () => {
             <Grid
               xs={3}
               sx={{
-                borderColor: "text.primary",
                 borderLeft: "1px solid",
+                borderColor: "grey.600",
               }}
             >
               <Stack component="ul" spacing={1}>
@@ -166,8 +166,8 @@ const Birds = () => {
               spacing={0}
               xs={4}
               sx={{
-                borderColor: "text.primary",
                 borderLeft: "1px solid",
+                borderLeftColor: "grey.600",
               }}
             >
               {bird?.regions.map((region) => {
@@ -177,7 +177,11 @@ const Birds = () => {
                     key={`${bird?.common_name}-${region?.name}`}
                     xs={size > 4 ? size : 4}
                   >
-                    <img src={region?.image} style={{ width: "100%" }} />
+                    <img
+                      src={region?.image}
+                      style={{ width: "100%" }}
+                      title={region?.name}
+                    />
                   </Grid>
                 );
               })}
@@ -186,10 +190,9 @@ const Birds = () => {
         ))}
       </Box>
       <Pagination
-        count={10}
         color="primary"
         variant="outlined"
-        // count={Math.ceil(data?.total_birds / 10) || 10}
+        count={Math.ceil(data?.total_birds / 10) || 10}
         page={page}
         onChange={handlePageChange}
         sx={{ paddingTop: "1.2rem", paddingBottom: "1.2rem" }}

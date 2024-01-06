@@ -152,9 +152,10 @@ const HabitatForm = ({
           {/* <label htmlFor="regions">Global Region:</label> */}
           <div>
             <Typography variant="caption" color="grey.700">
-              Global Region:
+              Global Region*
             </Typography>
             <Select
+              name="regionsInput"
               inputId="regionsInput"
               instanceId="regionsInstance"
               value={selectedRegion}
@@ -165,6 +166,13 @@ const HabitatForm = ({
               }}
               isSearchable
               required
+              theme={(theme) => ({
+                ...theme,
+                colors: {
+                  ...theme.colors,
+                  primary: "#AB003C",
+                },
+              })}
             />
           </div>
           <Button

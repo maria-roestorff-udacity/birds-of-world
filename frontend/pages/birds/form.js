@@ -11,6 +11,11 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import HomeIcon from "@mui/icons-material/Home";
 import FavoriteBorderSharpIcon from "@mui/icons-material/FavoriteBorderSharp";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import SearchIcon from "@mui/icons-material/Search";
+import Alert from "@mui/material/Alert";
+import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import { useToken } from "../../components/tokenContext";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
@@ -144,70 +149,87 @@ const BirdsForm = () => {
           <Button endIcon={<HomeIcon />}>Home</Button>
         </Link>
       </Stack>
-      {error && <div style={{ color: "red" }}>{error}</div>}
+      {error && <Alert severity="error">{error}</Alert>}
       <Box my={2}>
-        <h2>Fill in the Bird Form</h2>
+        <Typography variant="h2" gutterBottom>
+          Fill in the Bird Form
+        </Typography>
         <form onSubmit={onSubmitBird}>
-          <label htmlFor="common_name">Common name:</label>
-          <input
-            type="text"
-            name="common_name"
-            id="common_name"
-            value={value.common_name}
-            onChange={onChange}
-            size="30"
-            required
-          />
-          <br />
-          <label htmlFor="species">Species:</label>
-          <input
-            type="text"
-            name="species"
-            id="species"
-            value={value.species}
-            onChange={onChange}
-            size="30"
-            required
-          />
-          <br />
-          <p style={{ fontStyle: "italic" }}>
-            HINT: Go to your preferred image search engine. Filter for images in
-            the public domain. Copy image link in the input field.
-          </p>
-          <label htmlFor="image_link">Link for bird image:</label>
-          <input
-            type="text"
-            name="image_link"
-            id="image_link"
-            value={value.image_link}
-            onChange={onChange}
-            size="80"
-          />
-          <br />
-          <label htmlFor="habitats">Search for Habitats:</label>
-          <AsyncSelect
-            inputId="habitats"
-            instanceId="habitats"
-            value={selectedHabitats}
-            onChange={onSelect}
-            cacheOptions
-            isMulti
-            loadOptions={promiseHabitatOptions}
-            noOptionsMessage={() => "Search Again"}
-            required
-            isDisabled={!ownerRole}
-          />
-          <button type="submit" disabled={isLoading || !ownerRole}>
-            {isLoading
-              ? "Loading..."
-              : `${router?.query?.bird ? "Update" : "Add"} Bird`}
-          </button>
+          <Stack spacing={2}>
+            <TextField
+              id="common_name"
+              label="Common name"
+              value={value?.common_name}
+              onChange={onChange}
+              required
+            />
+            <TextField
+              id="species"
+              label="Species"
+              value={value?.species}
+              onChange={onChange}
+              required
+            />
+            <Alert severity="info" style={{ fontStyle: "italic" }}>
+              HINT: Go to your preferred image search engine. Filter for images
+              in the public domain. Copy image link in the input field below.
+            </Alert>
+            <TextField
+              id="image_link"
+              label="Link for bird image"
+              value={value?.image_link}
+              onChange={onChange}
+              required
+            />
+            <div>
+              <Stack direction="row">
+                <Typography variant="caption" color="grey.700">
+                  Search for Habitats*
+                </Typography>
+                <Tooltip title="Type to begin search" placement="right">
+                  <SearchIcon />
+                </Tooltip>
+              </Stack>
+              <AsyncSelect
+                name="habitatsinput"
+                inputId="habitatsinput"
+                instanceId="habitats"
+                value={selectedHabitats}
+                onChange={onSelect}
+                cacheOptions
+                isMulti
+                loadOptions={promiseHabitatOptions}
+                noOptionsMessage={() => "Type to Search Again"}
+                required
+                isDisabled={!ownerRole}
+                placeholder="Type to Search..."
+                theme={(theme) => ({
+                  ...theme,
+                  colors: {
+                    ...theme.colors,
+                    primary: "#AB003C",
+                  },
+                })}
+              />
+            </div>
+            <Button
+              endIcon={<SaveOutlinedIcon />}
+              type="submit"
+              disabled={isLoading || !ownerRole}
+            >
+              {isLoading
+                ? "Loading..."
+                : `${router?.query?.bird ? "Update" : "Add"} Bird`}
+            </Button>
+          </Stack>
         </form>
         <DeleteResource resource="bird" />
       </Box>
-      <p style={{ fontStyle: "italic" }}>
+
+      <Alert severity="info" style={{ fontStyle: "italic" }}>
         HINT: Cant find your Habitat? Add a new habitat below:
-      </p>
+      </Alert>
+
       <HabitatForm
         setSelectedHabitats={setSelectedHabitats}
         setBird={setValue}
