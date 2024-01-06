@@ -9,6 +9,7 @@ import Button from "@mui/material/Button";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import Alert from "@mui/material/Alert";
 import { useToken } from "../tokenContext";
+import { styled } from "@mui/material/styles";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -19,7 +20,7 @@ const HabitatForm = ({
   edit = false,
 }) => {
   const router = useRouter();
-  const { token, ownerRole } = useToken();
+  const { token } = useToken();
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [regionOptions, setRegionOptions] = useState(null);
@@ -39,7 +40,7 @@ const HabitatForm = ({
         .then((res) => res.json())
         .then((data) => {
           if (data?.regions) {
-            const options = data?.regions.map((item) => {
+            const options = data?.regions?.map?.((item) => {
               return { value: item?.id, label: item?.name };
             });
             setRegionOptions(options);
@@ -106,7 +107,9 @@ const HabitatForm = ({
         },
       });
       if (!response.ok) {
-        throw new Error("Failed to submit the data. Please try again.");
+        throw new Error(
+          "Failed to submit the data. Please try again, or search for your habitat to see if it already exists."
+        );
       }
       // Handle response if necessary
       const res = await response.json();
@@ -121,18 +124,24 @@ const HabitatForm = ({
         ]);
         setBird({ ...bird, habitats: [...bird.habitats, res.habitat.id] });
       }
-    } catch (error) {
-      // Capture the error message to display to the user
-      setError(error.message);
-      console.error(error);
-    } finally {
+
       if (router.pathname == "/birds/form") {
         setSelectedRegion(null);
         const newValue = { ...value };
         newValue.name = "";
         newValue.region_id = "";
         setValue(newValue);
+      } else if (router.pathname == "/habitats" && res?.habitat?.id) {
+        const dest = `${router.pathname}?habitat=${res?.habitat?.id}`;
+        router.push(dest, undefined, {
+          shallow: true,
+        });
       }
+    } catch (e) {
+      // Capture the error message to display to the user
+      setError(e.message);
+      console.error(e);
+    } finally {
       setLoading(false);
     }
   };
@@ -150,7 +159,7 @@ const HabitatForm = ({
             required
           />
           {/* <label htmlFor="regions">Global Region:</label> */}
-          <div>
+          <Item>
             <Typography variant="caption" color="grey.700">
               Global Region*
             </Typography>
@@ -173,14 +182,18 @@ const HabitatForm = ({
                   primary: "#AB003C",
                 },
               })}
+              className="react-select-container"
+              classNamePrefix="react-select"
             />
-          </div>
+          </Item>
           <Button
             endIcon={<SaveOutlinedIcon />}
             type="submit"
-            disabled={isLoading || !ownerRole}
+            disabled={isLoading}
           >
-            {isLoading ? "Loading..." : `${edit ? "Update" : "Add"} Habitat`}
+            {isLoading
+              ? "Loading..."
+              : `${edit && router?.query?.habitat ? "Update" : "Add"} Habitat`}
           </Button>
         </Stack>
       </form>
@@ -188,3 +201,9 @@ const HabitatForm = ({
   );
 };
 export default HabitatForm;
+
+const Item = styled("div")({
+  "& .react-select__menu": {
+    zIndex: 1000,
+  },
+});

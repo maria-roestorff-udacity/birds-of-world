@@ -1,9 +1,16 @@
 import { createTheme } from "@mui/material/styles";
 
 export const theme = createTheme({
+  mode: "light",
   palette: {
     primary: {
       main: "#AB003C",
+    },
+    background: {
+      default: "#ede7f6",
+    },
+    text: {
+      primary: "rgba(0,0,0,0.60)",
     },
   },
   components: {
@@ -15,6 +22,7 @@ export const theme = createTheme({
           zIndex: 1,
           "&:hover::before": {
             opacity: 1,
+            // zIndex: 1,
           },
           "&::before": {
             content: "''",

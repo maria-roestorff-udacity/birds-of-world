@@ -16,6 +16,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useToken } from "../../components/tokenContext";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
+const fallbackBird =
+  "https://tse1.mm.bing.net/th/id/OIP.VnKF_9XCsYHFrI4TZGritgHaFE?rs=1&pid=ImgDetMain";
 
 const Birds = () => {
   const [data, setData] = useState(null);
@@ -34,7 +36,7 @@ const Birds = () => {
         .then((data) => {
           setData(data);
         })
-        .catch((error) => setError(error.message))
+        .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
     }
   }, [token]);
@@ -84,7 +86,7 @@ const Birds = () => {
           borderColor: "grey.600",
         }}
       >
-        {data?.birds.map((bird) => (
+        {data?.birds?.map?.((bird) => (
           <Grid
             container
             spacing={0}
@@ -119,17 +121,13 @@ const Birds = () => {
               }}
             >
               <img
-                src={
-                  bird?.image_link ||
-                  "https://static.pexels.com/photos/139647/pexels-photo-139647-large.jpeg"
-                }
+                src={bird?.image_link || fallbackBird}
                 title={bird?.common_name}
                 alt={bird?.common_name}
                 style={{ width: "100%" }}
                 onError={(e) => {
                   e.currentTarget.onerror = null;
-                  e.currentTarget.src =
-                    "https://static.pexels.com/photos/139647/pexels-photo-139647-large.jpeg";
+                  e.currentTarget.src = fallbackBird;
                 }}
               />
             </Grid>
@@ -141,7 +139,7 @@ const Birds = () => {
               }}
             >
               <Stack component="ul" spacing={1}>
-                {bird?.habitats.map((habitat) => (
+                {bird?.habitats?.map?.((habitat) => (
                   <li key={`${bird?.common_name}-${habitat?.id}`}>
                     {ownerRole ? (
                       <Tooltip title="Edit Habitat" placement="right">
@@ -170,16 +168,16 @@ const Birds = () => {
                 borderLeftColor: "grey.600",
               }}
             >
-              {bird?.regions.map((region) => {
+              {bird?.regions?.map?.((region) => {
                 const size = 12 / bird?.regions.length;
                 return (
                   <Grid
                     key={`${bird?.common_name}-${region?.name}`}
-                    xs={size > 4 ? size : 4}
+                    xs={size > 6 ? size : 6}
                   >
                     <img
                       src={region?.image}
-                      style={{ width: "100%" }}
+                      style={{ width: "100%", maxWidth: 180 }}
                       title={region?.name}
                     />
                   </Grid>

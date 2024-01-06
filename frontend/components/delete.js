@@ -28,14 +28,16 @@ const DeleteResource = ({ resource = "habitat" }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      if (!response.ok) throw new Error("Delete Failed. Please try again.");
-    } catch (error) {
+      if (!response.ok) {
+        throw new Error("Delete Failed. Please try again.");
+      }
+      router.push("/birds");
+    } catch (e) {
       // Capture the error message to display to the user
-      setError(error.message);
-      console.error(error);
+      setError(e.message);
+      console.error(e);
     } finally {
       setLoading(false);
-      router.push("/birds");
     }
   };
 
@@ -44,7 +46,7 @@ const DeleteResource = ({ resource = "habitat" }) => {
       {error && <Alert severity="error">{error}</Alert>}
       <Button
         endIcon={<DeleteForeverIcon />}
-        disabled={isLoading || !router.query[resource] || !ownerRole}
+        disabled={isLoading || !router.query[resource]}
         onClick={onDelete}
       >
         {isLoading ? "Loading..." : `Delete ${resource}`}

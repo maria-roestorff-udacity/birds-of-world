@@ -17,6 +17,7 @@ import Alert from "@mui/material/Alert";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import { useToken } from "../../components/tokenContext";
+import { styled } from "@mui/material/styles";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -33,6 +34,7 @@ const BirdsForm = () => {
     image_link: "",
     habitats: "",
   });
+  console.log("error", error);
 
   useEffect(() => {
     if (router.isReady && token) {
@@ -44,19 +46,27 @@ const BirdsForm = () => {
         })
           .then((res) => res.json())
           .then((data) => {
+            console.log("data", data);
+            if (data.error) {
+              throw new Error(
+                `${
+                  data.message ?? "failed to load data, please refresh page"
+                } - Please return to the home page`
+              );
+            }
             const newValue = {
               common_name: data?.bird?.common_name,
               species: data?.bird?.species,
               image_link: data?.bird?.image_link,
-              habitats: data?.bird?.habitats.map((h) => h?.id),
+              habitats: data?.bird?.habitats?.map?.((h) => h?.id),
             };
-            const options = data?.bird?.habitats.map((h) => {
+            const options = data?.bird?.habitats?.map?.((h) => {
               return { value: h?.id, label: h?.name };
             });
             setValue(newValue);
             setSelectedHabitats(options);
           })
-          .catch((error) => setError(error.message))
+          .catch((e) => setError(e.message))
           .finally(() => setLoading(false));
       }
     }
@@ -75,15 +85,15 @@ const BirdsForm = () => {
       .then((data) => {
         if (!data?.success) throw new Error(data?.message || "Search Failed");
         if (data?.habitats) {
-          const options = data?.habitats.map((h) => {
+          const options = data?.habitats?.map?.((h) => {
             return { value: h?.id, label: h?.name };
           });
           return options;
         }
       })
-      .catch((error) => {
-        setError(error.message);
-        console.error(error);
+      .catch((e) => {
+        setError(e.message);
+        console.error(e);
       });
 
   const onSubmitBird = async (event) => {
@@ -95,7 +105,6 @@ const BirdsForm = () => {
 
     const url = `${urlBase}/birds${id ? `/${id}` : ""}`;
     const method = id ? "PATCH" : "POST";
-    let res;
 
     try {
       const response = await fetch(url, {
@@ -106,32 +115,34 @@ const BirdsForm = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      res = await response.json();
+      const res = await response.json();
       const defaultMessage = "Submission Failed, please try again.";
-      if (!res.success) throw new Error(res?.message || defaultMessage);
-    } catch (error) {
-      // Capture the error message to display to the user
-      setError(error.message);
-      console.error(error);
-    } finally {
-      setLoading(false);
-      if (res) {
+      if (!res.success) {
+        throw new Error(res?.message || defaultMessage);
+      }
+      if (res?.bird) {
         router.push(`${router.pathname}/?bird=${res?.bird}`, undefined, {
           shallow: true,
         });
       }
+    } catch (e) {
+      // Capture the error message to display to the user
+      setError(e.message);
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
   };
 
   const onChange = (e) => {
-    const name = e.target.name;
+    const name = e.target.id;
     const newValue = { ...value, [name]: e.target.value };
     setValue(newValue);
   };
 
   const onSelect = (e) => {
     setSelectedHabitats(e);
-    const newHabitats = e.map((habitat) => habitat.value);
+    const newHabitats = e?.map?.((habitat) => habitat.value);
     const newValue = { ...value, habitats: newHabitats };
     setValue(newValue);
   };
@@ -181,7 +192,7 @@ const BirdsForm = () => {
               onChange={onChange}
               required
             />
-            <div>
+            <Item>
               <Stack direction="row">
                 <Typography variant="caption" color="grey.700">
                   Search for Habitats*
@@ -201,8 +212,9 @@ const BirdsForm = () => {
                 loadOptions={promiseHabitatOptions}
                 noOptionsMessage={() => "Type to Search Again"}
                 required
-                isDisabled={!ownerRole}
                 placeholder="Type to Search..."
+                className="react-select-container"
+                classNamePrefix="react-select"
                 theme={(theme) => ({
                   ...theme,
                   colors: {
@@ -211,11 +223,11 @@ const BirdsForm = () => {
                   },
                 })}
               />
-            </div>
+            </Item>
             <Button
               endIcon={<SaveOutlinedIcon />}
               type="submit"
-              disabled={isLoading || !ownerRole}
+              disabled={isLoading}
             >
               {isLoading
                 ? "Loading..."
@@ -239,3 +251,9 @@ const BirdsForm = () => {
   );
 };
 export default BirdsForm;
+
+const Item = styled("div")({
+  "& .react-select__menu": {
+    zIndex: 1000,
+  },
+});
