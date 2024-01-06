@@ -18,35 +18,35 @@ AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
 
 
 token_payload = {
-    "iss": f"https://{AUTH0_DOMAIN}/",
-    "sub": "auth0|TestID",
-    "aud": API_AUDIENCE,
-    "iat": int(time()),
-    "exp": int(time() + 600),
-    "azp": "TestAzp",
-    "gty": "password",
+    'iss': f'https://{AUTH0_DOMAIN}/',
+    'sub': 'auth0|TestID',
+    'aud': API_AUDIENCE,
+    'iat': int(time()),
+    'exp': int(time() + 600),
+    'azp': 'TestAzp',
+    'gty': 'password',
 }
 
 owner_token_payload = {
     **token_payload,
-    "permissions": [
-        "delete:birds",
-        "delete:habitats",
-        "get:birds",
-        "get:habitats",
-        "get:regions",
-        "patch:birds",
-        "patch:habitats",
-        "post:birds",
-        "post:habitats"
+    'permissions': [
+        'delete:birds',
+        'delete:habitats',
+        'get:birds',
+        'get:habitats',
+        'get:regions',
+        'patch:birds',
+        'patch:habitats',
+        'post:birds',
+        'post:habitats'
     ]
 }
 viewer_token_payload = {
     **token_payload,
-    "permissions": [
-        "get:birds",
-        "get:habitats",
-        "get:regions",
+    'permissions': [
+        'get:birds',
+        'get:habitats',
+        'get:regions',
     ]
 }
 

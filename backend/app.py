@@ -57,7 +57,7 @@ def create_app(test_config=None):
             populate_birds()
         
 
-    CORS(app, origins="*")
+    CORS(app, origins='*')
 
     @app.after_request
     def after_request(response):
@@ -203,8 +203,8 @@ def create_app(test_config=None):
 
             return jsonify(
                 {
-                    "success": True,
-                    "deleted": bird_id
+                    'success': True,
+                    'deleted': bird_id
                 }
             )
 
@@ -368,8 +368,8 @@ def create_app(test_config=None):
 
             return jsonify(
                 {
-                    "success": True,
-                    "deleted": habitat_id
+                    'success': True,
+                    'deleted': habitat_id
                 }
             )
 
@@ -461,6 +461,3 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run()
-
-# curl http://127.0.0.1:5000/bird -X POST -H "Content-Type: application/json" -d '{"title":"Movie1", "actors":[1]}'
-# curl http://127.0.0.1:5000/habitat -X POST -H "Content-Type: application/json" -d '{"name":"John Doe"}'

@@ -20,8 +20,8 @@ def populate_region():
     ]
 
     for region in region_info:
-        name = region.get("name")
-        image = region.get("image")
+        name = region.get('name')
+        image = region.get('image')
         new_region = Region(name=name, image_link=image)
         new_region.insert()
 
@@ -38,8 +38,8 @@ def populate_habitats():
     ]
 
     for habitat in habitat_info:
-        name = habitat.get("name")
-        region = habitat.get("region")
+        name = habitat.get('name')
+        region = habitat.get('region')
         get_region = Region.query.filter(Region.name == region).one_or_none()
         new_habitat = Habitat(name=name, region_id=get_region.id)
         new_habitat.insert()
@@ -60,10 +60,10 @@ def populate_birds():
     ]
 
     for bird in bird_info:
-        common_name = bird.get("common_name")
-        species = bird.get("species")
-        image = bird.get("image")
-        habitats = bird.get("habitats")
+        common_name = bird.get('common_name')
+        species = bird.get('species')
+        image = bird.get('image')
+        habitats = bird.get('habitats')
         get_habitat = Habitat.query.filter(Habitat.name.in_(habitats)).all()
         new_bird = Bird(common_name=common_name,
                         species=species, image_link=image)
@@ -75,6 +75,3 @@ if __name__ == '__main__':
     populate_region()
     populate_habitats()
     populate_birds()
-
-# curl http://127.0.0.1:5000/movies -X POST -H "Content-Type: application/json" -d '{"title":"Movie1", "actors":[1]}'
-# curl http://127.0.0.1:5000/actors -X POST -H "Content-Type: application/json" -d '{"name":"John Doe"}'
