@@ -23,9 +23,7 @@ This section contains the code for the backend of the Birds of the World App. Th
 ├── test_no_auth.py *** unittests without authentication.
 ├── populate.py *** initially seed our database and test database.
 ├── requirements.txt *** dependencies to install with "pip3 install -r requirements.txt"
-├── runtime.txt
-├── setup.sh
-└── Procfile
+└── setup.sh
 ```
 
 ## API Reference
@@ -35,6 +33,45 @@ This section contains the code for the backend of the Birds of the World App. Th
 - Backend URL: TODO
 - Frontend URL:
 - Authentication: TODO
+
+### How go get a token
+
+#### Option 1
+
+Get the values for the variables below from the project submission notes.
+
+```
+AUTH0_DOMAIN
+ALGORITHMS
+API_AUDIENCE
+AUTH0_CLIENT_ID
+CALLBACK_URI
+```
+
+Replace the variables in the URL below
+
+```
+https://{{AUTH0_DOMAIN}}/authorize?audience={{API_AUDIENCE}}&response_type=token&client_id={{AUTH0_CLIENT_ID}}&redirect_uri={{CALLBACK_URI}}
+```
+
+Paste the URL in a browser and use the username and password provided in the project submission notes.
+This will result in a token being returned in the browser URL. This token can be copied and used for cURL requests.
+
+#### Option 2
+
+- run the setup.sh file provided in the submission notes: `source setup.sh`.
+- run `python get_auth0_token.py`
+- copy the tokens printed by the `python get_auth0_token.py` script in cURL requests
+
+### Example cURL requests
+
+#### List all birds
+
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/birds'`
+
+#### Add a new bird
+
+`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "Test flamingo","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'http://127.0.0.1:5000/birds'`
 
 ### Roles: `Owners` and `Viewers`
 
@@ -84,6 +121,12 @@ The API will return three error types when requests fail:
 - Request Arguments: `page` - integer, `limit` - integer
 - Returns: An object with 10 paginated birds, total birds and success state
 
+example curl:
+
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/birds'`
+
+example response:
+
 ```json
 {
   "birds": [
@@ -119,6 +162,12 @@ The API will return three error types when requests fail:
 - Request Arguments: `bird_id` - integer
 - Returns: An object containing a bird object and success state
 
+example curl:
+
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/birds/1'`
+
+example response:
+
 ```json
 {
   "bird": {
@@ -146,22 +195,27 @@ The API will return three error types when requests fail:
 `POST '/birds'`
 
 - Sends a post request in order to add a new bird
-- Request Body:
+
+example curl:
+
+`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "Test flamingo","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'http://127.0.0.1:5000/birds'`
+
+example request body:
 
 ```json
 {
-  "common_name": "American flamingo",
+  "common_name": "Test flamingo",
   "habitats": [2, 3],
-  "image_link": "url",
+  "image_link": "example url",
   "species": "Phoenicopterus ruber"
 }
 ```
 
-- Returns:
+example request response:
 
 ```json
 {
-  "bird": 3,
+  "bird": 1,
   "success": true
 }
 ```
@@ -172,22 +226,27 @@ The API will return three error types when requests fail:
 
 - sends a patch request in order to edit a specified bird
 - Request Arguments: `bird_id` - integer
-- Request Body:
+
+example curl:
+
+`curl -X PATCH -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "bird patched","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'http://127.0.0.1:5000/birds/1'`
+
+example request body:
 
 ```json
 {
-  "common_name": "American flamingo",
+  "common_name": "Test flamingo patch",
   "habitats": [2, 3],
-  "image_link": "url",
+  "image_link": "example url",
   "species": "Phoenicopterus ruber"
 }
 ```
 
-- Returns:
+example request response:
 
 ```json
 {
-  "bird": 3,
+  "bird": 1,
   "success": true
 }
 ```
@@ -200,9 +259,15 @@ The API will return three error types when requests fail:
 - Request Arguments: `bird_id` - integer
 - Returns: the id of the deleted bird, success value
 
+example curl:
+
+`curl -X DELETE -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/birds/1'`
+
+example request response:
+
 ```json
 {
-  "deleted": 3,
+  "deleted": 1,
   "success": true
 }
 ```
@@ -214,6 +279,12 @@ The API will return three error types when requests fail:
 - Fetches a list of habitat objects, success state and total habitats
 - Request Arguments: `page` - integer, `limit` - integer
 - Returns: An object with 10 paginated habitats, total habitats and success state
+
+example curl:
+
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/habitats'`
+
+example response:
 
 ```json
 {
@@ -242,6 +313,12 @@ The API will return three error types when requests fail:
 - Request Arguments: `habitat_id` - integer
 - Returns: An object containing a habitat object and success state
 
+example curl:
+
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/habitats/1'`
+
+example response:
+
 ```json
 {
   "habitat": {
@@ -260,7 +337,12 @@ The API will return three error types when requests fail:
 #### Post New Habitat
 
 - sends a post request in order to add a new habitat
-- Request Body:
+
+example curl:
+
+`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"name": "Test Europe","region_id": 1}' 'http://127.0.0.1:5000/habitats'`
+
+example request body:
 
 ```json
 {
@@ -269,7 +351,7 @@ The API will return three error types when requests fail:
 }
 ```
 
-- Returns:
+example request response:
 
 ```json
 {
@@ -283,6 +365,12 @@ The API will return three error types when requests fail:
 - Fetches a list of habitat objects that has a name key that value contains the search term that was supplied in the request argument.
 - Search term is case insensitive
 - Returns a list of habitat objects filtered by the specified search. And a success value, total number of habitats,
+
+example curl:
+
+`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"search": "Af"}' 'http://127.0.0.1:5000/habitats'`
+
+example request body:
 
 ```json
 {
@@ -317,7 +405,12 @@ The API will return three error types when requests fail:
 
 - Sends a patch request in order to edit a specified habitat
 - Request Arguments: `habitat_id` - integer
-- Request Body:
+
+example curl:
+
+`curl -X PATCH -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"name": "Patched habitat","region_id": 1}' 'http://127.0.0.1:5000/habitats/1'`
+
+example request body:
 
 ```json
 {
@@ -326,11 +419,11 @@ The API will return three error types when requests fail:
 }
 ```
 
-- Returns:
+example request response:
 
 ```json
 {
-  "habitat": 3,
+  "habitat": 1,
   "success": true
 }
 ```
@@ -343,9 +436,15 @@ The API will return three error types when requests fail:
 - Request Arguments: `habitat_id` - integer
 - Returns: the id of the deleted habitat, success value
 
+example curl:
+
+`curl -X DELETE -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/habitats/1'`
+
+example request response:
+
 ```json
 {
-  "deleted": 3,
+  "deleted": 1,
   "success": true
 }
 ```
@@ -357,6 +456,12 @@ The API will return three error types when requests fail:
 - Fetches a list of regions objects and success state
 - Request Arguments: None
 - Returns: An object with regions and success state
+
+example curl:
+
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/regions'`
+
+example response:
 
 ```json
 {
@@ -435,6 +540,8 @@ export TEST_DATABASE_URL=
 export AUTH0_DOMAIN=
 export ALGORITHMS=
 export API_AUDIENCE=
+export AUTH0_CLIENT_ID=
+export CALLBACK_URI=
 ```
 
 ### Install Dependencies

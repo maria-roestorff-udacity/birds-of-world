@@ -7,7 +7,9 @@ This section contains the code for the frontend of the Birds of the World App. T
 - **Node and NPM** Javascript runtime environment and node package manager
 - **React** Javascript library to build user interface components
 - **NextJS** React Framework to build web applications
-- **MUI** Web server framework
+- **MUI** Ready to use React components
+- **Jose** JavaScript Object Signing and Encryption for JWTs
+- **Auth0 React SDK** Auth0 authentication and authorization in React
 
 ## Main Files: Project Structure
 

@@ -4,9 +4,6 @@ import json
 from app import create_app
 import requests
 
-from dotenv import load_dotenv
-load_dotenv()
-
 database_path = os.environ['TEST_DATABASE_URL']
 if database_path.startswith('postgres://'):
     database_path = database_path.replace('postgres://', 'postgresql://', 1)
@@ -14,12 +11,12 @@ if database_path.startswith('postgres://'):
 AUTH0_DOMAIN = os.environ['AUTH0_DOMAIN']
 API_AUDIENCE = os.environ['API_AUDIENCE']
 
-AUTH0_CLIENT_ID = os.getenv('AUTH0_CLIENT_ID')
-AUTH0_CLIENT_SECRET = os.getenv('AUTH0_CLIENT_SECRET')
-AUTH0_OWNER_USERNAME = os.getenv('AUTH0_OWNER_USERNAME')
-AUTH0_OWNER_PASSWORD = os.getenv('AUTH0_OWNER_PASSWORD')
-AUTH0_VIEWER_USERNAME = os.getenv('AUTH0_VIEWER_USERNAME')
-AUTH0_VIEWER_PASSWORD = os.getenv('AUTH0_VIEWER_PASSWORD')
+AUTH0_CLIENT_ID = os.environ['AUTH0_CLIENT_ID']
+AUTH0_CLIENT_SECRET = os.environ['AUTH0_CLIENT_SECRET']
+AUTH0_OWNER_USERNAME = os.environ['AUTH0_OWNER_USERNAME']
+AUTH0_OWNER_PASSWORD = os.environ['AUTH0_OWNER_PASSWORD']
+AUTH0_VIEWER_USERNAME = os.environ['AUTH0_VIEWER_USERNAME']
+AUTH0_VIEWER_PASSWORD = os.environ['AUTH0_VIEWER_PASSWORD']
 
 owner_payload = {'client_id': f'{AUTH0_CLIENT_ID}',
                  'client_secret': f'{AUTH0_CLIENT_SECRET}',
@@ -50,9 +47,11 @@ viewer_access_token = viewer_role.json().get('access_token', None)
 headers_owner = {'Authorization': f'Bearer {owner_access_token}'}
 headers_viewers = {'HTTP_AUTHORIZATION': f'Bearer {viewer_access_token}'}
 
+print(f'owner_access_token: {owner_access_token}')
+print(f'viewer_access_token: {viewer_access_token}')
 
-class BirdsOfTWorldsTestCase(unittest.TestCase):
-    '''This class represents the birds of the world test case'''
+class BirdsOfTWorldsTestWithRealTokensCase(unittest.TestCase):
+    '''This class represents the birds of the world test case with Real tokens'''
 
     def setUp(self):
         '''Define test variables and initialize app.'''
