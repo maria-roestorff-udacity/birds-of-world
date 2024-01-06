@@ -24,7 +24,7 @@ const Birds = () => {
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const { token, ownerRole } = useToken();
-  const [page, setPage] = React.useState(1);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     if (token) {
@@ -39,9 +39,10 @@ const Birds = () => {
         .catch((e) => setError(e.message))
         .finally(() => setLoading(false));
     }
-  }, [token]);
+  }, [token, page]);
 
   const handlePageChange = (event, value) => {
+    console.log('handlePageChange value',value)
     setPage(value);
   };
 
