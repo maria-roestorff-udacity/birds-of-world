@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
 import FavoriteBorderSharpIcon from "@mui/icons-material/FavoriteBorderSharp";
+import FormatListBulletedSharpIcon from '@mui/icons-material/FormatListBulletedSharp';
 import Alert from "@mui/material/Alert";
 
 export default function Index() {
@@ -41,6 +42,9 @@ export default function Index() {
             </Button>
             <Link href="/birds" passHref>
               <Button endIcon={<FavoriteBorderSharpIcon />}>View Birds</Button>
+            </Link>
+            <Link href="/habitats" passHref>
+              <Button endIcon={<FormatListBulletedSharpIcon />}>View Habitats</Button>
             </Link>
           </>
         ) : (

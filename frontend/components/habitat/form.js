@@ -131,7 +131,7 @@ const HabitatForm = ({
         newValue.name = "";
         newValue.region_id = "";
         setValue(newValue);
-      } else if (router.pathname == "/habitats" && res?.habitat?.id) {
+      } else if (router.pathname == "/habitats/form" && res?.habitat?.id) {
         const dest = `${router.pathname}?habitat=${res?.habitat?.id}`;
         router.push(dest, undefined, {
           shallow: true,

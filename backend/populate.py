@@ -38,7 +38,7 @@ def populate_habitats():
         {'name': 'Europe', 'region': 'Europe'},
         {'name': 'Galápagos Islands of Ecuador', 'region': 'South America'},
         {'name': 'New Guinea Island', 'region': 'Oceania'},
-        {'name': 'North America', 'region': 'Africa'},
+        {'name': 'North America', 'region': 'North America'},
         {'name': 'Northern Africa', 'region': 'Africa'},
         {'name': 'South America', 'region': 'South America'},
         {'name': 'Southern Africa', 'region': 'Africa'},

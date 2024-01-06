@@ -13,6 +13,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import Alert from "@mui/material/Alert";
 import Tooltip from "@mui/material/Tooltip";
 import CircularProgress from "@mui/material/CircularProgress";
+import FormatListBulletedSharpIcon from '@mui/icons-material/FormatListBulletedSharp';
 import { useToken } from "../../components/tokenContext";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
@@ -42,13 +43,12 @@ const Birds = () => {
   }, [token, page]);
 
   const handlePageChange = (event, value) => {
-    console.log('handlePageChange value',value)
     setPage(value);
   };
 
   if (isLoading) return <CircularProgress color="secondary" />;
   if (!data || !data?.birds)
-    return <Alert severity="warning">No profile data</Alert>;
+    return <Alert severity="warning">No bird data</Alert>;
 
   return (
     <Container maxWidth="lg">
@@ -57,10 +57,13 @@ const Birds = () => {
       </Typography>
       <Stack direction="row" justifyContent="space-between" pb={2}>
         {ownerRole && (
-          <Link href="birds/form" passHref>
+          <Link href="/birds/form" passHref>
             <Button endIcon={<AddCircleOutlineIcon />}>Add a new Bird</Button>
           </Link>
         )}
+        <Link href="/habitats" passHref>
+          <Button endIcon={<FormatListBulletedSharpIcon />}>View Habitats</Button>
+        </Link>
         <Link href="/" passHref>
           <Button endIcon={<HomeIcon />}>Home</Button>
         </Link>
@@ -144,7 +147,7 @@ const Birds = () => {
                   <li key={`${bird?.common_name}-${habitat?.id}`}>
                     {ownerRole ? (
                       <Tooltip title="Edit Habitat" placement="right">
-                        <Link href={`habitats?habitat=${habitat?.id}`}>
+                        <Link href={`habitats/form?habitat=${habitat?.id}`}>
                           <Typography
                             variant="body1"
                             sx={{ display: "inline" }}

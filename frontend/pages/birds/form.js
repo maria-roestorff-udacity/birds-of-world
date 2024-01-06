@@ -23,7 +23,7 @@ const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
 const BirdsForm = () => {
   const router = useRouter();
-  const { token, ownerRole } = useToken();
+  const { token } = useToken();
 
   const [isLoading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -34,7 +34,6 @@ const BirdsForm = () => {
     image_link: "",
     habitats: "",
   });
-  console.log("error", error);
 
   useEffect(() => {
     if (router.isReady && token) {
@@ -46,7 +45,6 @@ const BirdsForm = () => {
         })
           .then((res) => res.json())
           .then((data) => {
-            console.log("data", data);
             if (data.error) {
               throw new Error(
                 `${
