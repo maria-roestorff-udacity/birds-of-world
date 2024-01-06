@@ -1,6 +1,8 @@
 import Router from "next/router";
 import { Auth0Provider } from "@auth0/auth0-react";
 import TokenContextProvider from "../components/tokenContext";
+import { ThemeProvider } from "@mui/material/styles";
+import { theme } from "../components/theme";
 
 const onRedirectCallback = (appState) => {
   // Use Next.js's Router.replace method to replace the url
@@ -20,7 +22,9 @@ export default function MyApp({ Component, pageProps }) {
       }}
     >
       <TokenContextProvider>
-        <Component {...pageProps} />
+        <ThemeProvider theme={theme}>
+          <Component {...pageProps} />
+        </ThemeProvider>
       </TokenContextProvider>
     </Auth0Provider>
   );

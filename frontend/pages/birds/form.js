@@ -5,6 +5,12 @@ import Box from "@mui/system/Box";
 import HabitatForm from "../../components/habitat/form";
 import AsyncSelect from "react-select/async";
 import DeleteResource from "../../components/delete";
+import Container from "@mui/material/Container";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import HomeIcon from "@mui/icons-material/Home";
+import FavoriteBorderSharpIcon from "@mui/icons-material/FavoriteBorderSharp";
 import { useToken } from "../../components/tokenContext";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
@@ -126,8 +132,18 @@ const BirdsForm = () => {
   };
 
   return (
-    <div>
-      <h1>Birds Of The World.</h1> <Link href="/birds">Back to Birds</Link>
+    <Container maxWidth="lg">
+      <Typography variant="h1" gutterBottom>
+        Birds Of The World.
+      </Typography>
+      <Stack direction="row" justifyContent="space-between" pb={2}>
+        <Link href="/birds" passHref>
+          <Button endIcon={<FavoriteBorderSharpIcon />}>Back to Birds</Button>
+        </Link>
+        <Link href="/" passHref>
+          <Button endIcon={<HomeIcon />}>Home</Button>
+        </Link>
+      </Stack>
       {error && <div style={{ color: "red" }}>{error}</div>}
       <Box my={2}>
         <h2>Fill in the Bird Form</h2>
@@ -197,7 +213,7 @@ const BirdsForm = () => {
         setBird={setValue}
         bird={value}
       />
-    </div>
+    </Container>
   );
 };
 export default BirdsForm;

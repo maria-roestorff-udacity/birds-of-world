@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Select from "react-select";
 import Box from "@mui/system/Box";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
+import Alert from "@mui/material/Alert";
 import { useToken } from "../tokenContext";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
@@ -133,35 +139,42 @@ const HabitatForm = ({
 
   return (
     <Box my={2}>
-      {error && <div style={{ color: "red" }}>{error}</div>}
+      {error && <Alert severity="error">{error}</Alert>}
       <form onSubmit={onSubmitHabitat}>
-        <label htmlFor="name">Habitat name:</label>
-        <input
-          type="text"
-          name="name"
-          id="name"
-          value={value.name}
-          onChange={(e) => setValue({ ...value, name: e.target.value })}
-          size="30"
-          required
-        />
-        <br />
-        <label htmlFor="regions">Global Region:</label>
-        <Select
-          inputId="regions"
-          instanceId="regions"
-          value={selectedRegion}
-          options={regionOptions}
-          onChange={(e) => {
-            setSelectedRegion(e);
-            setValue({ ...value, region_id: e.value });
-          }}
-          isSearchable
-          required
-        />
-        <button type="submit" disabled={isLoading || !ownerRole}>
-          {isLoading ? "Loading..." : `${edit ? "Update" : "Add"} Habitat`}
-        </button>
+        <Stack spacing={2}>
+          <TextField
+            id="name"
+            label="Habitat name"
+            value={value?.name}
+            onChange={(e) => setValue({ ...value, name: e.target.value })}
+            required
+          />
+          {/* <label htmlFor="regions">Global Region:</label> */}
+          <div>
+            <Typography variant="caption" color="grey.700">
+              Global Region:
+            </Typography>
+            <Select
+              inputId="regionsInput"
+              instanceId="regionsInstance"
+              value={selectedRegion}
+              options={regionOptions}
+              onChange={(e) => {
+                setSelectedRegion(e);
+                setValue({ ...value, region_id: e.value });
+              }}
+              isSearchable
+              required
+            />
+          </div>
+          <Button
+            endIcon={<SaveOutlinedIcon />}
+            type="submit"
+            disabled={isLoading || !ownerRole}
+          >
+            {isLoading ? "Loading..." : `${edit ? "Update" : "Add"} Habitat`}
+          </Button>
+        </Stack>
       </form>
     </Box>
   );

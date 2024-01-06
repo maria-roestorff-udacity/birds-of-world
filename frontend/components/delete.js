@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useToken } from "./tokenContext";
+import Button from "@mui/material/Button";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 
 const urlBase = process.env.NEXT_PUBLIC_BASEURL;
 
@@ -36,16 +40,16 @@ const DeleteResource = ({ resource = "habitat" }) => {
   };
 
   return (
-    <>
-      {error && <div style={{ color: "red" }}>{error}</div>}
-      <button
-        type="button"
+    <Box sx={{ marginTop: "1.2rem" }}>
+      {error && <Alert severity="error">{error}</Alert>}
+      <Button
+        endIcon={<DeleteForeverIcon />}
         disabled={isLoading || !router.query[resource] || !ownerRole}
         onClick={onDelete}
       >
         {isLoading ? "Loading..." : `Delete ${resource}`}
-      </button>
-    </>
+      </Button>
+    </Box>
   );
 };
 export default DeleteResource;

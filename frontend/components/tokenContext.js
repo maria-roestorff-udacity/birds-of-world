@@ -21,10 +21,7 @@ const TokenContextProvider = ({ children }) => {
             },
           });
           setToken(getToken);
-          console.log(getToken);
           const claims = jose.decodeJwt(getToken);
-          console.log(claims?.permissions);
-
           const ownerRolePer = [
             "delete:birds",
             "delete:habitats",
