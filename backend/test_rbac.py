@@ -89,7 +89,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         self.patch_bird_success = {'habitats': [1]}
         self.patch_bird_422_duplicate = {'common_name': 'Budgerigar'}
         self.post_habitat_success = {
-            'name': 'Europe',
+            'name': 'North Europe',
             'region_id': 4,
             'habitat_bird': 1}
         self.post_search_habitat_success = {'search': 'a'}
@@ -177,7 +177,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['bird'], 3)
+        self.assertEqual(data['bird'], 13)
 
     def test_422_post_duplicate_bird(self):
         self.client().post('/birds',  json=self.post_bird_success, headers=headers_owner)
@@ -286,6 +286,7 @@ class BirdsOfTWorldsTestCase(unittest.TestCase):
         res = self.client().post(
             '/habitats',  json=self.post_habitat_success, headers=headers_owner)
         data = json.loads(res.data)
+        print(data)
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['habitat'])

@@ -1,4 +1,4 @@
-from models import setup_db, Region, Habitat, Bird
+from models import Region, Habitat, Bird
 
 
 def populate_region():

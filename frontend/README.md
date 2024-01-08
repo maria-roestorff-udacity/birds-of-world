@@ -17,7 +17,9 @@ This section contains the code for the frontend of the Birds of the World App. T
 ├── components
 │   ├── habitat
 │   │    └── form.js
-│   └── delete.js
+│   ├── delete.js
+│   ├── theme.js
+│   └── tokenContext.js
 ├── pages
 │   ├── birds
 │   │   ├── form.js

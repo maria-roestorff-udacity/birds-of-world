@@ -19,7 +19,7 @@ The frontend is built with React in Javascript and the backend is a Flask app th
 │   ├── auth.py *** integration with Auth0 for authentication.
 │   ├── populate.py *** initially seed our database and test database.
 │   ├── test_rbac.py *** unittests to test the server.
-│   ├── test_no_auth.py *** unittests without authentication.
+│   ├── mock_rsa_keys.py *** mocks authorization from Auth0 account
 │   ├── requirements.txt *** dependencies to install with "pip3 install -r requirements.txt"
 │   ├── README.md
 │   └── setup.sh
@@ -27,7 +27,9 @@ The frontend is built with React in Javascript and the backend is a Flask app th
     ├── components
     │   ├── habitat
     │   │    └── form.js
-    │   └── delete.js
+    │   ├── delete.js
+    │   ├── theme.js
+    │   └── tokenContext.js
     ├── pages
     │   ├── birds
     │   │   ├── form.js
@@ -38,7 +40,6 @@ The frontend is built with React in Javascript and the backend is a Flask app th
     │   └── index.js
     ├── packages.json
     └── README.md
-
 ```
 
 ## Backend Tech Stack
@@ -83,13 +84,12 @@ AUTH0_DOMAIN
 ALGORITHMS
 API_AUDIENCE
 AUTH0_CLIENT_ID
-CALLBACK_URI
 ```
 
 Replace the variables in the URL below
 
 ```
-https://{{AUTH0_DOMAIN}}/authorize?audience={{API_AUDIENCE}}&response_type=token&client_id={{AUTH0_CLIENT_ID}}&redirect_uri={{CALLBACK_URI}}
+https://{{AUTH0_DOMAIN}}/authorize?audience={{API_AUDIENCE}}&response_type=token&client_id={{AUTH0_CLIENT_ID}}&redirect_uri=http://localhost:3000
 ```
 
 Paste the URL in a browser and use the username and password provided in the project submission notes.
@@ -156,6 +156,7 @@ The API will return three error types when requests fail:
 `GET '/birds?page=${integer}&limit=${integer}'`
 
 - Fetches a list of bird objects, success state and total birds
+- Permission: get:birds
 - Request Arguments: `page` - integer, `limit` - integer
 - Returns: An object with 10 paginated birds, total birds and success state
 
@@ -197,6 +198,7 @@ example response:
 `GET '/birds/{bird_id}'`
 
 - Fetches a specified bird object and success state
+- Permission: get:birds
 - Request Arguments: `bird_id` - integer
 - Returns: An object containing a bird object and success state
 
@@ -233,6 +235,7 @@ example response:
 `POST '/birds'`
 
 - Sends a post request in order to add a new bird
+- Permission: post:birds
 
 example curl:
 
@@ -262,7 +265,8 @@ example request response:
 
 `PATCH '/birds/{bird_id}'`
 
-- sends a patch request in order to edit a specified bird
+- Sends a patch request in order to edit a specified bird
+- Permission: patch:birds
 - Request Arguments: `bird_id` - integer
 
 example curl:
@@ -294,6 +298,7 @@ example request response:
 `DELETE '/birds/{bird_id}'`
 
 - Deletes the bird that has the ID that was in the query parameter if it exists.
+- Permission: delete:birds
 - Request Arguments: `bird_id` - integer
 - Returns: the id of the deleted bird, success value
 
@@ -315,6 +320,7 @@ example request response:
 `GET '/habitats?page=${integer}&limit=${integer}'`
 
 - Fetches a list of habitat objects, success state and total habitats
+- Permission: get:habitats
 - Request Arguments: `page` - integer, `limit` - integer
 - Returns: An object with 10 paginated habitats, total habitats and success state
 
@@ -348,6 +354,7 @@ example response:
 `GET '/habitats/{habitat_id}'`
 
 - Fetches a specified habitat object and success state
+- Permission: get:habitats
 - Request Arguments: `habitat_id` - integer
 - Returns: An object containing a habitat object and success state
 
@@ -374,7 +381,8 @@ example response:
 
 #### Post New Habitat
 
-- sends a post request in order to add a new habitat
+- Sends a post request in order to add a new habitat
+- Permission: post:habitats
 
 example curl:
 
@@ -401,6 +409,7 @@ example request response:
 #### Search Habitats
 
 - Fetches a list of habitat objects that has a name key that value contains the search term that was supplied in the request argument.
+- Permission: post:habitats
 - Search term is case insensitive
 - Returns a list of habitat objects filtered by the specified search. And a success value, total number of habitats,
 
@@ -442,6 +451,7 @@ example request body:
 `PATCH '/habitats/{habitat_id}'`
 
 - Sends a patch request in order to edit a specified habitat
+- Permission: patch:habitats
 - Request Arguments: `habitat_id` - integer
 
 example curl:
@@ -471,6 +481,7 @@ example request response:
 `DELETE '/habitats/{habitat_id}'`
 
 - Deletes the habitat that has the ID that was in the query parameter if it exists.
+- Permission: delete:habitats
 - Request Arguments: `habitat_id` - integer
 - Returns: the id of the deleted habitat, success value
 
@@ -492,6 +503,7 @@ example request response:
 `GET '/regions'`
 
 - Fetches a list of regions objects and success state
+- Permission: get:regions
 - Request Arguments: None
 - Returns: An object with regions and success state
 
@@ -579,7 +591,11 @@ export AUTH0_DOMAIN=
 export ALGORITHMS=
 export API_AUDIENCE=
 export AUTH0_CLIENT_ID=
-export CALLBACK_URI=
+export AUTH0_CLIENT_SECRET=
+export AUTH0_OWNER_USERNAME=
+export AUTH0_OWNER_PASSWORD=
+export AUTH0_VIEWER_USERNAME=
+export AUTH0_VIEWER_PASSWORD=
 ```
 
 ### Install Dependencies
@@ -620,7 +636,7 @@ createdb testbotwdb
 python3 test_rbac.py
 ```
 
-_Note:_ The tests works with Authentication and permission roles. Thats why all the secret environments should be defined. It is possible to run `test_no_auth.py` for tests without authentication.
+_Note:_ The tests mocks authentication and permission roles. It is possible to run `python3 -m unittest local/test_auth0_token.py` for tests with real auth0 tokens. It is important to define all the environments secrets.
 
 ## Frontend Development Setup
 
