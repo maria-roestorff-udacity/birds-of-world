@@ -69,8 +69,8 @@ The frontend is built with React in Javascript and the backend is a Flask app th
 
 ### Getting Started
 
-- Backend URL: https://birds-of-the-world-backend.onrender.com/birds
-- Frontend https://birds-of-the-world-frontend.onrender.com:
+- Backend URL: https://birds-of-the-world-backend.onrender.com
+- Frontend https://birds-of-the-world-frontend.onrender.com
 
 ### Authentication: How go get a token
 
