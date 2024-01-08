@@ -51,10 +51,10 @@ def create_app(test_config=None):
             populate_birds()
     else:
         setup_db(app)
-        with app.app_context():
-            populate_region()
-            populate_habitats()
-            populate_birds()
+        # with app.app_context():
+        #     populate_region()
+        #     populate_habitats()
+        #     populate_birds()
         
 
     CORS(app, origins='*')
