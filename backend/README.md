@@ -30,11 +30,10 @@ This section contains the code for the backend of the Birds of the World App. Th
 
 ### Getting Started
 
-- Backend URL: TODO
-- Frontend URL:
-- Authentication: TODO
+- Backend URL: https://birds-of-the-world-backend.onrender.com/birds
+- Frontend https://birds-of-the-world-frontend.onrender.com:
 
-### How go get a token
+### Authentication: How go get a token
 
 #### Option 1
 
@@ -66,11 +65,11 @@ This will result in a token being returned in the browser URL. This token can be
 
 #### List all birds
 
-`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/birds'`
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'https://birds-of-the-world-backend.onrender.com/birds'`
 
 #### Add a new bird
 
-`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "Test flamingo","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'http://127.0.0.1:5000/birds'`
+`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "Test flamingo","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'https://birds-of-the-world-backend.onrender.com/birds'`
 
 ### Roles: `Owners` and `Viewers`
 
@@ -123,7 +122,7 @@ The API will return three error types when requests fail:
 
 example curl:
 
-`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/birds'`
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'https://birds-of-the-world-backend.onrender.com/birds'`
 
 example response:
 
@@ -165,7 +164,7 @@ example response:
 
 example curl:
 
-`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/birds/1'`
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'https://birds-of-the-world-backend.onrender.com/birds/1'`
 
 example response:
 
@@ -200,7 +199,7 @@ example response:
 
 example curl:
 
-`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "Test flamingo","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'http://127.0.0.1:5000/birds'`
+`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "Test flamingo","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'https://birds-of-the-world-backend.onrender.com/birds'`
 
 example request body:
 
@@ -232,7 +231,7 @@ example request response:
 
 example curl:
 
-`curl -X PATCH -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "bird patched","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'http://127.0.0.1:5000/birds/1'`
+`curl -X PATCH -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"common_name": "bird patched","habitats": [2, 3],"image_link":"example url","species": "Phoenicopterus ruber"}' 'https://birds-of-the-world-backend.onrender.com/birds/1'`
 
 example request body:
 
@@ -265,7 +264,7 @@ example request response:
 
 example curl:
 
-`curl -X DELETE -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/birds/1'`
+`curl -X DELETE -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'https://birds-of-the-world-backend.onrender.com/birds/1'`
 
 example request response:
 
@@ -287,7 +286,7 @@ example request response:
 
 example curl:
 
-`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/habitats'`
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'https://birds-of-the-world-backend.onrender.com/habitats'`
 
 example response:
 
@@ -321,7 +320,7 @@ example response:
 
 example curl:
 
-`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/habitats/1'`
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'https://birds-of-the-world-backend.onrender.com/habitats/1'`
 
 example response:
 
@@ -347,7 +346,7 @@ example response:
 
 example curl:
 
-`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"name": "Test Europe","region_id": 1}' 'http://127.0.0.1:5000/habitats'`
+`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"name": "Test Europe","region_id": 1}' 'https://birds-of-the-world-backend.onrender.com/habitats'`
 
 example request body:
 
@@ -376,7 +375,7 @@ example request response:
 
 example curl:
 
-`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"search": "Af"}' 'http://127.0.0.1:5000/habitats'`
+`curl -X POST -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"search": "Af"}' 'https://birds-of-the-world-backend.onrender.com/habitats'`
 
 example request body:
 
@@ -417,7 +416,7 @@ example request body:
 
 example curl:
 
-`curl -X PATCH -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"name": "Patched habitat","region_id": 1}' 'http://127.0.0.1:5000/habitats/1'`
+`curl -X PATCH -H 'Authorization: bearer eyToken' -H "Content-type: application/json" -d '{"name": "Patched habitat","region_id": 1}' 'https://birds-of-the-world-backend.onrender.com/habitats/1'`
 
 example request body:
 
@@ -448,7 +447,7 @@ example request response:
 
 example curl:
 
-`curl -X DELETE -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/habitats/1'`
+`curl -X DELETE -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'https://birds-of-the-world-backend.onrender.com/habitats/1'`
 
 example request response:
 
@@ -470,7 +469,7 @@ example request response:
 
 example curl:
 
-`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'http://127.0.0.1:5000/regions'`
+`curl -X GET -H 'Authorization: bearer eyToken' -H "Content-type: application/json" 'https://birds-of-the-world-backend.onrender.com/regions'`
 
 example response:
 
