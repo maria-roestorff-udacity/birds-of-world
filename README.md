@@ -6,6 +6,9 @@ The Birds of the World App allows users to take their favourite birds and add th
 
 Viewer and owner users can go to the **birds** page to view all the existing birds. Only owner users can add new birds on the **birds/form** page. The owner user needs to provide the common name, species, and a link to an image of the bird. The owner user also needs to specify in which habitats the birds can be found. If the bird is found in a new habitat, the owner user can click on the add habitat button to update the bird habitat information.
 
+- Backend URL: https://birds-of-the-world-backend.onrender.com
+- Frontend URL: https://birds-of-the-world-frontend.onrender.com
+
 All backend code follows [PEP8 style guidelines](https://www.python.org/dev/peps/pep-0008/).
 The frontend is built with React in Javascript and the backend is a Flask app that uses SQLAlchemy as the ORM and postgres as the database.
 
@@ -70,7 +73,7 @@ The frontend is built with React in Javascript and the backend is a Flask app th
 ### Getting Started
 
 - Backend URL: https://birds-of-the-world-backend.onrender.com
-- Frontend https://birds-of-the-world-frontend.onrender.com
+- Frontend URL: https://birds-of-the-world-frontend.onrender.com
 
 ### Authentication: How go get a token
 

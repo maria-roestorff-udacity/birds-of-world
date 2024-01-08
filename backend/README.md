@@ -31,7 +31,7 @@ This section contains the code for the backend of the Birds of the World App. Th
 ### Getting Started
 
 - Backend URL: https://birds-of-the-world-backend.onrender.com
-- Frontend https://birds-of-the-world-frontend.onrender.com
+- Frontend URL: https://birds-of-the-world-frontend.onrender.com
 
 ### Authentication: How go get a token
 
